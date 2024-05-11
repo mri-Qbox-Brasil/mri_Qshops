@@ -23,7 +23,8 @@ function IsBoss()
 end
 
 function OpenBossMenu()
-    TriggerEvent('qb-bossmenu:client:OpenMenu')
+    -- TriggerEvent('qb-bossmenu:client:OpenMenu')
+    exports.qbx_management:OpenBossMenu('job')
 end
 
 AddEventHandler('onResourceStart', function(resource)
