@@ -2,7 +2,7 @@
 --------------- https://discord.gg/wasabiscripts  -------------
 ---------------------------------------------------------------
 local swapHook, buyHook
-
+Shops = GlobalState.Shops or {}
 if not IsESX() and not IsQBCore() then
 	error('Framework not detected')
 end
@@ -15,6 +15,12 @@ CreateThread(function()
 	end
 end)
 
+local function dispatchEvents(source, response)
+	GlobalState:set('Shops', Shops, true)
+	LoadShops(true)
+	Wait(2000)
+	TriggerClientEvent('mri_Qshops:client:LoadSelect', -1)
+end
 CreateThread(function()
 	while GetResourceState('ox_inventory') ~= 'started' do Wait(1000) end
 
@@ -99,3 +105,47 @@ RegisterNetEvent('wasabi_oxshops:setData', function(shop, slot, price)
 	exports.ox_inventory:SetMetadata(shop, slot, metadata)
 	TriggerEvent('wasabi_oxshops:refreshShop', shop)
 end)
+
+ function LoadShops(isStarting)
+    if isStarting then
+        DB.CreateTable()
+    end
+end
+
+AddEventHandler('onResourceStart', function(resourceName)
+  Wait(200)
+    if (GetCurrentResourceName() == resourceName) then
+	local sql = 'SELECT * FROM mri_qshops'
+	local result = MySQL.Sync.fetchAll(sql, {})
+	local shops = {}
+    if result and #result > 0 then
+	for _, row in ipairs(result) do
+	local sho = {
+		label = row.label,
+		jobname = row.jobname,
+		blip_coords = row.blip_coords,
+		blip_sprite = row.blip_sprite ,
+		blip_color = row.blip_color ,
+		blip_enabled = row.blip_enabled,
+		bossMenu_coords = row.bossMenu_coords ,
+	    bossMenu_range = row.bossMenu_range ,
+		bossMenu_enabled = row.bossMenu_enabled ,
+		locations = row.locations ,
+		range = row.range ,
+		shop_coords = row.shop_coords ,
+		shop_range = row.shop_range ,
+	}
+	shops[_] = sho
+	end
+	end
+	Shops = shops
+	dispatchEvents(source)
+    end
+end)
+if GetResourceState('mri_Qbox') ~= 'started' then
+	lib.addCommand('shopmenu',{
+		help = 'menu de shop menu',
+	}, function(source, args,  raw)	
+       lib.callback('mri_shops:shopmenu', source)
+   end)
+end

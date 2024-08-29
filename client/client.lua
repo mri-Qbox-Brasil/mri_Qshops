@@ -138,3 +138,17 @@ CreateThread(function()
         end
     end
 end)
+
+AddStateBagChangeHandler('mri_Q_shop_zone', 'global', function(bagname, key, value)
+    if value then
+        if type(value) ~= "table" then
+            -- print("Error: value is not a table")
+            return
+        end
+        Config.Data = value
+        --init()
+    end
+end)
+
+
+
