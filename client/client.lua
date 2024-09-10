@@ -1,6 +1,29 @@
------------------For support, scripts, and more----------------
---------------- https://discord.gg/wasabiscripts  -------------
----------------------------------------------------------------
+function ShopsDataBaseClient(shopnews)
+    Shops = GlobalState.Shops or {}
+    shopnew = {}
+    for k, v in pairs(Shops) do
+        shopnew[#shopnew + 1] = {
+            id = v.id,
+            label = v.id,
+            jobname = v.jobname,
+            blipName = v.blipName,
+            blipCoords = v.blipCoords,
+            blipDistancia = v.blipDistancia,
+            blipCor = v.blipCor,
+            blipEnabled = v.blipEnabled,
+            blipEscala = v.blipEscala,
+            MenuCoords = v.MenuCoords,
+            MenuDistancia = v.MenuDistancia,
+            MenuEnabled = v.MenuEnabled,
+            armazemCoords = v.armazemCoords,
+            armazemDistancia = v.armazemDistancia,
+            shopCoords = v.shopCoords,
+            shopDistancia = v.shopDistancia
+        }
+        print("shopdataClient"..json.encode(shop))
+    end
+    return shopnew
+end
 
 RegisterNetEvent('wasabi_oxshops:setProductPrice', function(shop, slot)
     local input = lib.inputDialog(Strings.sell_price, {Strings.amount_input})
@@ -16,60 +39,74 @@ RegisterNetEvent('wasabi_oxshops:setProductPrice', function(shop, slot)
     })
 end)
 
-local function createBlip(coords, sprite, color, text, scale)
-    local blip = AddBlipForCoord(coords.x, coords.y, coords.z)
-    SetBlipSprite(blip, sprite)
-    SetBlipDisplay(blip, 4)
-    SetBlipScale(blip, scale)
-    SetBlipColour(blip, color)
-    SetBlipAsShortRange(blip, true)
-    BeginTextCommandSetBlipName("STRING")
-    AddTextComponentSubstringPlayerName(text)
-    EndTextCommandSetBlipName(blip)
-    return blip
-end
-
-CreateThread(function()
-    for _, v in pairs(Config.Shops) do
-        if v.blip.enabled then
-            createBlip(v.blip.coords, v.blip.sprite, v.blip.color, v.blip.string, v.blip.scale)
+    CreateThread(function()
+         function CreateBlip(coords, sprite, color, text, scale)
+        local Shops = ShopsDataBase(v)
+            for k, v in pairs(Shops) do
+                local coords = v.blipCoords
+                local x = coords.x
+                local y = coords.y
+                local z = coords.z
+                local blips = vector3(x, y, z)
+                local blip = AddBlipForCoord(blips)
+                SetBlipSprite(blip, sprite)
+                SetBlipDisplay(blip, 4)
+                SetBlipScale(blip, scale)
+                SetBlipColour(blip, color)
+                SetBlipAsShortRange(blip, true)
+                BeginTextCommandSetBlipName("STRING")
+                AddTextComponentSubstringPlayerName(text)
+                EndTextCommandSetBlipName(blip)
+                carregarShops()
+                return blip
+            end
         end
-    end
-end)
+        local Shops = ShopsDataBase(v)
+        for k, v in pairs(Shops) do
+            if v.blip_enabled then
+                CreateBlip(v.blipCoords, v.blipDistancia, v.blipCor, v.blipName, v.blipEscala)
+            end
+        end
+    end)
 
-CreateThread(function()
-    local textUI, points = nil, {}
-    while not PlayerLoaded do Wait(500) end
-    for k,v in pairs(Config.Shops) do
-        if not points[k] then points[k] = {} end
-        points[k].stash = lib.points.new({
-            coords = v.locations.stash.coords,
-            distance = v.locations.stash.range,
-            shop = k
-        })
-        points[k].shop = lib.points.new({
-            coords = v.locations.shop.coords,
-            distance = v.locations.shop.range,
-            shop = k
-        })
-        if v.bossMenu.enabled then
-            points[k].bossMenu = lib.points.new({
-                coords = v.bossMenu.coords,
-                distance = v.bossMenu.range,
-                shop = k
+    CreateThread(function()
+        local textUI
+        local Shops = ShopsDataBase(v)
+        for k, v in pairs(Shops) do
+            local armazemCoords = v.armazemCoords
+            local MenuCoords = v.MenuCoords
+            local shopCoords = v.shopCoords
+
+            print(v.armazemCoords, v.armazemDistancia, v.label)
+            local armazem = lib.points.new({
+                coords = v.armazemCoords,
+                distance = v.armazemDistancia,
+                shop = v.label
+            })
+            local shop = lib.points.new({
+                coords = v.MenuCoords,
+                distance = v.MenuDistancia,
+                shop = v.label
+            })
+            print(v.shopCoords, v.shopDistancia, v.label, 'ola mundo')   
+            local bossMenu = lib.points.new({
+                coords = v.shopCoords,
+                distance = v.shopDistancia,
+                shop = v.label
             })
         end
-    end
 
-    for _, v in pairs(points) do
-        function v.stash:nearby()
-            if not self.isClosest or PlayerData.job.name ~= self.shop then return end
+        function armazem:nearby()
+            if not self.isClosest or PlayerData.job.name ~= self.shop then
+                return
+            end
             if Config.DrawMarkers then
-                DrawMarker(2, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 30, 150, 30, 222, false, false, 0, true, false, false, false)
+                DrawMarker(2, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15,
+                    30, 150, 30, 222, false, false, 0, true, false, false, false)
             end
             if self.currentDistance < self.distance then
                 if not textUI then
-                    lib.showTextUI(Config.Shops[self.shop].locations.stash.string)
+                    lib.showTextUI('[E] - Acesssar armazem')
                     textUI = true
                 end
                 if IsControlJustReleased(0, 38) then
@@ -78,48 +115,61 @@ CreateThread(function()
             end
         end
 
-        function v.stash:onExit()
-            if not self.isClosest then return end
+        function armazem:onExit()
+            if not self.isClosest then
+                return
+            end
             if textUI then
                 lib.hideTextUI()
                 textUI = nil
             end
         end
 
-        function v.shop:nearby()
-            if not self.isClosest then return end
+        function shop:nearby()
+            if not self.isClosest then
+                return
+            end
             if Config.DrawMarkers then
-                DrawMarker(2, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 30, 150, 30, 222, false, false, 0, true, false, false, false)
+                DrawMarker(2, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15,
+                    30, 150, 30, 222, false, false, 0, true, false, false, false)
             end
             if self.currentDistance < self.distance then
                 if not textUI then
-                    lib.showTextUI(Config.Shops[self.shop].locations.shop.string)
+                    lib.showTextUI("[E] - Acesssar loja")
                     textUI = true
                 end
                 if IsControlJustReleased(0, 38) then
-                    exports.ox_inventory:openInventory('shop', { type = self.shop, id = 1 })
+                    exports.ox_inventory:openInventory('shop', {
+                        type = self.shop,
+                        id = 1
+                    })
                 end
             end
         end
 
-        function v.shop:onExit()
-            if not self.isClosest then return end
+        function shop:onExit()
+            if not self.isClosest then
+                return
+            end
             if textUI then
                 lib.hideTextUI()
                 textUI = nil
             end
         end
 
-        if v?.bossMenu then
+        if bossMenu then
             function v.bossMenu:nearby()
-                if not self.isClosest then return end
+                if not self.isClosest then
+                    return
+                end
                 if IsBoss() then
                     if self.currentDistance < self.distance then
                         if Config.DrawMarkers then
-                            DrawMarker(2, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 30, 150, 30, 222, false, false, 0, true, false, false, false)
+                            DrawMarker(2, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                0.3, 0.2, 0.15, 30, 150, 30, 222, false, false, 0, true, false, false, false)
                         end
                         if not textUI then
-                            lib.showTextUI(Config.Shops[self.shop].bossMenu.string)
+                            lib.showTextUI("[E] - Acesssar menu")
                             textUI = true
                         end
                         if IsControlJustReleased(0, 38) then
@@ -129,26 +179,16 @@ CreateThread(function()
                 end
             end
 
-            function v.bossMenu:onExit()
+            function bossMenu:onExit()
                 if textUI then
                     lib.hideTextUI()
                     textUI = nil
                 end
             end
         end
-    end
-end)
+    end)
 
-AddStateBagChangeHandler('mri_Q_shop_zone', 'global', function(bagname, key, value)
-    if value then
-        if type(value) ~= "table" then
-            -- print("Error: value is not a table")
-            return
-        end
-        Config.Data = value
-        --init()
-    end
-end)
-
-
-
+    RegisterNetEvent("mri-Qshops:carregarshop", function()
+        ShopsDataBaseClient(Shops)
+        print('Shops atualizados indo para client.lua')
+    end)

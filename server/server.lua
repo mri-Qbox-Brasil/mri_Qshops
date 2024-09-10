@@ -7,6 +7,7 @@ if not IsESX() and not IsQBCore() then
 	error('Framework not detected')
 end
 
+
 CreateThread(function()
 	if IsESX() then
 		for k in pairs(Config.Shops) do
@@ -15,29 +16,24 @@ CreateThread(function()
 	end
 end)
 
-local function dispatchEvents(source, response)
-	GlobalState:set('Shops', Shops, true)
-	LoadShops(true)
-	Wait(2000)
-	TriggerClientEvent('mri_Qshops:client:LoadSelect', -1)
-end
 CreateThread(function()
 	while GetResourceState('ox_inventory') ~= 'started' do Wait(1000) end
 
-	for k, v in pairs(Config.Shops) do
+	for k, v in pairs(Shops) do
 		local stash = {
-			id = k,
-			label = v.label..' '..Strings.inventory,
+			id = v.id,
+			label = v.label,
 			slots = 50,
-			weight = 100000,
+			weight = 100,
 		}
-		exports.ox_inventory:RegisterStash(stash.id, stash.label, stash.slots, stash.weight)
-		local items = exports.ox_inventory:GetInventoryItems(k, false)
+		print(stash.label, stash.slots, stash.weight*1000,true)
+		exports.ox_inventory:RegisterStash(stash.label,stash.label, stash.slots, stash.weight*1000)
+		local items = exports.ox_inventory:GetInventoryItems(stash.id, false)
 		local stashItems = {}
 		if items and items ~= {} then
 			for _, v2 in pairs(items) do
 				if v2 and v2.name then
-					stashItems[#stashItems + 1] = { name = v2.name, metadata = v2.metadata, count = v2.count, price = (v2.metadata.shopData.price or 0) }
+					stashItems[#stashItems + 1] = { name = v2.name, metadata = v2.metadata, count = v2.count, price = (v2.metadata.price or 0) }
 				end
 			end
 
@@ -45,7 +41,7 @@ CreateThread(function()
 				name = v.label,
 				inventory = stashItems,
 				locations = {
-					v.locations.shop.coords,
+					v.shop_coords,
 				}
 			})
 		end
@@ -63,7 +59,7 @@ CreateThread(function()
 
 	buyHook = exports.ox_inventory:registerHook('buyItem', function(payload)
 		local metadata = payload.metadata
-		if metadata?.shopData then
+		if metadata.shopData then
 			exports.ox_inventory:RemoveItem(metadata.shopData.shop, payload.itemName, payload.count)
 			AddMoney(metadata.shopData.shop, metadata.shopData.price)
 		end
@@ -77,19 +73,20 @@ RegisterNetEvent('wasabi_oxshops:refreshShop', function(shop)
 	for _, v in pairs(items) do
 		if v and v.name then
 			local metadata = v.metadata
-			if metadata?.shopData then
+			if metadata.shopData then
 				stashItems[#stashItems + 1] = { name = v.name, metadata = metadata, count = v.count, price = metadata.shopData.price }
 			end
 		end
 	end
-
+	for k, v in pairs(Shops) do
 	exports.ox_inventory:RegisterShop(shop, {
-		name = Config.Shops[shop].label,
+		name = v.label,
 		inventory = stashItems,
 		locations = {
-			Config.Shops[shop].locations.shop.coords,
+			v.shop_coords,
 		}
 	})
+  end
 end)
 
 RegisterNetEvent('wasabi_oxshops:setData', function(shop, slot, price)
@@ -106,42 +103,6 @@ RegisterNetEvent('wasabi_oxshops:setData', function(shop, slot, price)
 	TriggerEvent('wasabi_oxshops:refreshShop', shop)
 end)
 
- function LoadShops(isStarting)
-    if isStarting then
-        DB.CreateTable()
-    end
-end
-
-AddEventHandler('onResourceStart', function(resourceName)
-  Wait(200)
-    if (GetCurrentResourceName() == resourceName) then
-	local sql = 'SELECT * FROM mri_qshops'
-	local result = MySQL.Sync.fetchAll(sql, {})
-	local shops = {}
-    if result and #result > 0 then
-	for _, row in ipairs(result) do
-	local sho = {
-		label = row.label,
-		jobname = row.jobname,
-		blip_coords = row.blip_coords,
-		blip_sprite = row.blip_sprite ,
-		blip_color = row.blip_color ,
-		blip_enabled = row.blip_enabled,
-		bossMenu_coords = row.bossMenu_coords ,
-	    bossMenu_range = row.bossMenu_range ,
-		bossMenu_enabled = row.bossMenu_enabled ,
-		locations = row.locations ,
-		range = row.range ,
-		shop_coords = row.shop_coords ,
-		shop_range = row.shop_range ,
-	}
-	shops[_] = sho
-	end
-	end
-	Shops = shops
-	dispatchEvents(source)
-    end
-end)
 if GetResourceState('mri_Qbox') ~= 'started' then
 	lib.addCommand('shopmenu',{
 		help = 'menu de shop menu',
