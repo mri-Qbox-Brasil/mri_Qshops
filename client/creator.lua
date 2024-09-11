@@ -1,12 +1,27 @@
-function ShopsDataBase(datasho)
+function ShopsDataBase()
     Shops = GlobalState.Shops or {}
     shop = {}
     for k, v in pairs(Shops) do
         shop[#shop + 1] = {
             id = v.id,
-            label = v.label
+            label = v.id,
+            jobname = v.jobname,
+            blipName = v.blipName,
+            blipCoords = v.blipCoords,
+            blipDistancia = v.blipDistancia,
+            blipCor = v.blipCor,
+            blipEnabled = v.blipEnabled,
+            blipEscala = v.blipEscala,
+            MenuCoords = v.MenuCoords,
+            MenuDistancia = v.MenuDistancia,
+            MenuEnabled = v.MenuEnabled,
+            armazemCoords = v.armazemCoords,
+            armazemDistancia = v.armazemDistancia,
+            shopCoords = v.shopCoords,
+            shopDistancia = v.shopDistancia
         }
-        print("shopdata")
+        print(json.encode(shop))
+    
     end
     return shop
 end
@@ -330,7 +345,7 @@ function Mrishops(name)
         end
         Shops[key] = shop
         TriggerServerEvent('mri-qshops:InserirShop', dadoshop)
-        TriggerServerEvent('mri-Qshops:SelectStartShop', -1)
+        TriggerServerEvent('mri-Qshops:SelectStartShop')
     else
         print('erro input')
     end
@@ -340,7 +355,6 @@ end
 function ListaMenu(name)
     local shopData = {}
     local shopList = {}
-    local Shops = ShopsDataBase(v)
     for k, v in pairs(Shops) do
         table.insert(shopList, {
             title = v.label,
@@ -369,8 +383,8 @@ function ListaMenu(name)
     lib.showContext('Lista_menu')
 end
 
-RegisterNetEvent("mri-Qshops:dispatchEvents", function()
-    ShopsDataBase(Shops)
+RegisterNetEvent("mri-Qshops:carregarshop", function()
+    ShopsDataBase()
     print('Shops atualizados indo para database')
 end)
 

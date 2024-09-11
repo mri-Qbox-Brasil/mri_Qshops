@@ -28,7 +28,6 @@ end
 local function dispatchEvents(source, response)
     GlobalState:set('Shops', Shops, true)
     TriggerClientEvent("mri-Qshops:carregarshop", -1)
-    TriggerClientEvent("mri-Qshops:dispatchEvents", -1)
     -- Wait(2000)
     if response then
         print('pasei por aqui')
@@ -64,7 +63,7 @@ RegisterNetEvent('mri-qshops:InserirShop', function(data)
     dispatchEvents(source, response)
 end)
 
-RegisterNetEvent('mri-Qshops:SelectStartShop', function(resource)
+RegisterNetEvent('mri-Qshops:SelectStartShop', function()
     local sql = 'SELECT * FROM mri_Qshops'
     local result = MySQL.Sync.fetchAll(sql, {})
     local shops = {}
@@ -89,7 +88,7 @@ RegisterNetEvent('mri-Qshops:SelectStartShop', function(resource)
                 shopDistancia = row.shopDistancia
             }
             shops[k] = sho
-            print(json.encode(sho))
+            print('fiz select na data base')
         end
     end
     Shops = shops
