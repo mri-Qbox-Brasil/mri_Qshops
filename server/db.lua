@@ -2,6 +2,13 @@ Shops = {}
 
 RegisterNetEvent("mri-qshops:insertShop", function(data)
 	local source = source
+
+	if not IsPlayerAceAllowed(source, "admin") then 
+		return TriggerClientEvent("ox_lib:notify", source, {
+			type = "error",
+			description = "Você não tem permissão para usar este comando.",
+		})
+	end
 	local response = {
 		type = "success",
 		description = "Sucesso ao salvar!",
@@ -19,7 +26,7 @@ RegisterNetEvent("mri-qshops:insertShop", function(data)
 			columns = columns .. ", " .. k
 			placeholders = placeholders .. ", @" .. k
 		end
-		params["@" .. k] = v -- Associa a chave ao valor correspondente
+		params["@" .. k] = v
 	end
 
 	local result = MySQL.Sync.execute(string.format(sql, columns, placeholders), params)
@@ -53,32 +60,39 @@ RegisterNetEvent("mri-Qshops:UpdateShop", function(Shop)
 		description = "Sucesso ao Update!",
 	}
 	local source = source
-	local sql = nil
+
+	local function updateShopField(sql, params)
+		local result = MySQL.update.await(sql, params)
+		if result <= 0 then
+			response.type = "error"
+			response.description = "Erro ao excluir."
+		end
+	end
+
 	if Shop.shopCoords then
-		local sql = "UPDATE mri_Qshops SET shopCoords = ?  WHERE label = ?"
-		local result = MySQL.update.await(sql, { json.encode(Shop.shopCoords), Shop.label })
-		if result <= 0 then
-			response.type = "error"
-			response.description = "Erro ao excluir."
-		end
+		updateShopField(
+			"UPDATE mri_Qshops SET shopCoords = ? WHERE label = ?",
+			{ json.encode(Shop.shopCoords), Shop.label }
+		)
 	end
+
 	if Shop.armazemCoords then
-		local sql = "UPDATE mri_Qshops SET armazemCoords = ?  WHERE label = ?"
-		local result = MySQL.update.await(sql, { json.encode(Shop.armazemCoords), Shop.label })
-		if result <= 0 then
-			response.type = "error"
-			response.description = "Erro ao excluir."
-		end
+		updateShopField(
+			"UPDATE mri_Qshops SET armazemCoords = ? WHERE label = ?",
+			{ json.encode(Shop.armazemCoords), Shop.label }
+		)
 	end
+
 	if Shop.MenuCoords then
-		sql = "UPDATE mri_Qshops SET MenuCoords = ?, MenuBossEnabled = ? WHERE label = ?"
-		local result = MySQL.update.await(sql, { json.encode(Shop.MenuCoords), Shop.MenuBossEnabled, Shop.label })
+		updateShopField(
+			"UPDATE mri_Qshops SET MenuCoords = ?, MenuBossEnabled = ? WHERE label = ?",
+			{ json.encode(Shop.MenuCoords), Shop.MenuBossEnabled, Shop.label }
+		)
 	end
+
 	if Shop.blipEnabled then
-		local sql =
-			"UPDATE mri_Qshops SET blipName = ?,blipCor = ? ,blipEnabled = ?,blipSprite = ?,blipscale = ?, blipcoords = ? WHERE label = ?"
-		local result = MySQL.update.await(
-			sql,
+		updateShopField(
+			"UPDATE mri_Qshops SET blipName = ?, blipCor = ?, blipEnabled = ?, blipSprite = ?, blipscale = ?, blipcoords = ? WHERE label = ?",
 			{
 				Shop.blipName,
 				Shop.blipCor,
@@ -89,11 +103,8 @@ RegisterNetEvent("mri-Qshops:UpdateShop", function(Shop)
 				Shop.label,
 			}
 		)
-		if result <= 0 then
-			response.type = "error"
-			response.description = "Erro ao excluir."
-		end
 	end
+
 	GetShops(source, response)
 end)
 
@@ -127,12 +138,10 @@ function GetShops(source, response)
 		end
 	end
 	Shops = shops
-
-    TriggerClientEvent("mri_Qshops:updatesDBshop", -1, Shops)
-    if response then
-        TriggerClientEvent("ox_lib:notify", source, response)
-    end
-    
+	TriggerClientEvent("mri_Qshops:updatesDBshop", -1, Shops)
+	if response then
+		TriggerClientEvent("ox_lib:notify", source, response)
+	end
 	return Shops
 end
 exports("GetShops", GetShops)
@@ -153,7 +162,6 @@ end
 
 local function executeQueries(queries, callback)
 	local index = 1
-
 	local function executeNextQuery()
 		if index > #queries then
 			if callback then
@@ -161,21 +169,18 @@ local function executeQueries(queries, callback)
 			end
 			return
 		end
-
 		MySQL.Async.execute(queries[index], {}, function()
 			print("Tabela verificada/criada: " .. index)
 			index = index + 1
 			executeNextQuery()
 		end)
 	end
-
 	executeNextQuery()
 end
 
 local function createTables()
 	local filePath = "database.sql"
 	local queries = splitStr(LoadResourceFile(GetCurrentResourceName(), filePath), ";")
-    print("Recurso " .. resourceName .. " iniciado. Verificando/criando tabelas...")
 
 	executeQueries(queries, function()
 		print("Todas as tabelas foram verificadas/criadas.")
@@ -184,6 +189,7 @@ end
 
 AddEventHandler("onResourceStart", function(resourceName)
 	if GetCurrentResourceName() == resourceName then
+		print("Recurso " .. resourceName .. " iniciado. Verificando/criando tabelas...")
 		createTables()
 	end
 end)
