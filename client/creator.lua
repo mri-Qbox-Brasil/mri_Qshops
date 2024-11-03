@@ -116,6 +116,7 @@ function Bancadashop(name)
         shopCoords = result
         }
         TriggerServerEvent('mri-Qshops:UpdateShop', shops)
+        lib.showContext('config_menu')
     end
 end
 
@@ -128,6 +129,7 @@ function Armazem(name)
         }
         TriggerServerEvent('mri-Qshops:UpdateShop', shops)
         print(json.encode(shops),'armazem')
+        lib.showContext('config_menu')
     end
 end
 
@@ -146,6 +148,7 @@ function Bossmenu(name)
         }
         TriggerServerEvent('mri-Qshops:UpdateShop', shops)
         print(json.encode(shops),'bossmenu')
+        lib.showContext('config_menu')
     end
 end
 
@@ -244,6 +247,8 @@ function Mrishops(name)
 end
 
 function ListaMenu(name)
+    local Shops = lib.callback.await('mri_Qshops:server:GetShops')
+    
     local shopList = {}
     for k, v in pairs(Shops) do
         table.insert(shopList, {

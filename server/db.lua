@@ -112,7 +112,6 @@ function GetShops(source, response)
 	local sql = "SELECT * FROM mri_Qshops"
 	local result = MySQL.Sync.fetchAll(sql, {})
 	local shops = {}
-	Wait(400)
 	if result and #result > 0 then
 		for k, v in ipairs(result) do
 			print(json.encode(k))
@@ -184,6 +183,8 @@ local function createTables()
 
 	executeQueries(queries, function()
 		print("Todas as tabelas foram verificadas/criadas.")
+		GetShops()
+		TriggerEvent("mri_Qshops:server:createHooks")
 	end)
 end
 

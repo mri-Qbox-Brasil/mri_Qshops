@@ -1,4 +1,3 @@
-local shops = exports.mri_Qshops:GetShops()
 local swapHook, buyHook
 if not IsESX() and not IsQBCore() then
 	error("Framework not detected")
@@ -8,11 +7,16 @@ lib.callback.register("mri_Qshops:server:registerStash", function(source, id, la
 	return exports.ox_inventory:RegisterStash(id, label, slots, weight)
 end)
 
-CreateThread(function()
+lib.callback.register("mri_Qshops:server:GetShops", function()
+	return exports.mri_Qshops:GetShops()
+end)
+
+RegisterNetEvent("mri_Qshops:server:createHooks", function()
+	local shops = exports.mri_Qshops:GetShops()
+
 	while GetResourceState("ox_inventory") ~= "started" do
 		Wait(400)
 	end
-	print(json.encode(shops), "server.lua shops")
 	for k, v in pairs(shops) do
 		print(json.encode(v.jobname), "server.lua")
 		local stash = {
@@ -44,7 +48,6 @@ CreateThread(function()
 	end
 
 	swapHook = exports.ox_inventory:registerHook("swapItems", function(payload)
-		print(json.encode(shops), "server.lua")
 		for k, v in pairs(shops) do
 			if payload.fromInventory == v.jobname then
 				TriggerEvent("mri_qshops:refreshShop", v.jobname)
@@ -64,6 +67,8 @@ CreateThread(function()
 end)
 
 RegisterNetEvent("mri_qshops:refreshShop", function(shop)
+	local shops = exports.mri_Qshops:GetShops()
+
 	local items = exports.ox_inventory:GetInventoryItems(shop, false)
 	local stashItems = {}
 	for _, v in pairs(items) do
