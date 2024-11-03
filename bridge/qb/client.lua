@@ -4,12 +4,11 @@ local QBCore = exports['qb-core']:GetCoreObject()
 
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
-    PlayerLoaded = true
+    exports.mri_Qshops:mriMenuShops()
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     PlayerData = {}
-    PlayerLoaded = false
 end)
 
 RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
@@ -34,7 +33,7 @@ AddEventHandler('onResourceStart', function(resource)
     if cache.resource == resource then
         Wait(500)
         PlayerData = QBCore.Functions.GetPlayerData()
-        PlayerLoaded = true
+        exports.mri_Qshops:mriMenuShops()
     end
 end)
 

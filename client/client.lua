@@ -30,9 +30,9 @@ local function createBlip(blipcoords, blipName, blipSprite, blipCor, blipscale)
     return blip
 end
 
-local function mriMenuShops(Shops)
+local function mriMenuShops()
+    local Shops = lib.callback.await('mri_Qshops:server:GetShops')
     local textUI, points = nil, {}
-    while not PlayerLoaded do Wait(500) end
     for k, v in pairs(Shops) do
         local job = v.jobname
         local armazemcoords = v.armazemCoords and vector3(v.armazemCoords.x, v.armazemCoords.y, v.armazemCoords.z) or nil
@@ -145,6 +145,7 @@ local function mriMenuShops(Shops)
         end
     end
 end
+exports('mriMenuShops', mriMenuShops)
 
 RegisterNetEvent('mri_Qshops:updatesDBshop')
 AddEventHandler('mri_Qshops:updatesDBshop', function(shops)

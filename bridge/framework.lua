@@ -1,5 +1,4 @@
 PlayerData = {}
-PlayerLoaded = false
 
 function IsESX()
     return GetResourceState("es_extended") ~= "missing"
