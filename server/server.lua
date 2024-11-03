@@ -61,7 +61,6 @@ CreateThread(function()
 end)
 
 RegisterNetEvent('mri_qshops:refreshShop', function(shop)
-	Wait(250)
 	local items = exports.ox_inventory:GetInventoryItems(shop, false)
 	local stashItems = {}
 	for _, v in pairs(items) do

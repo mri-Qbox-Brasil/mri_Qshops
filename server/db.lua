@@ -1,10 +1,4 @@
 Shops = {}
-local function dispatchEvents(source, response)
-	TriggerClientEvent("mri_Qshops:updatesDBshop", -1, Shops)
-	if response then
-		TriggerClientEvent("ox_lib:notify", source, response)
-	end
-end
 
 RegisterNetEvent("mri-qshops:insertShop", function(data)
 	local source = source
@@ -133,11 +127,16 @@ function GetShops(source, response)
 		end
 	end
 	Shops = shops
-	dispatchEvents(source, response)
+
+    TriggerClientEvent("mri_Qshops:updatesDBshop", -1, Shops)
+    if response then
+        TriggerClientEvent("ox_lib:notify", source, response)
+    end
+    
 	return Shops
 end
-
 exports("GetShops", GetShops)
+
 local function splitStr(inputstr, sep)
 	if sep == nil then
 		sep = "%s"
@@ -176,6 +175,8 @@ end
 local function createTables()
 	local filePath = "database.sql"
 	local queries = splitStr(LoadResourceFile(GetCurrentResourceName(), filePath), ";")
+    print("Recurso " .. resourceName .. " iniciado. Verificando/criando tabelas...")
+
 	executeQueries(queries, function()
 		print("Todas as tabelas foram verificadas/criadas.")
 	end)
@@ -183,8 +184,6 @@ end
 
 AddEventHandler("onResourceStart", function(resourceName)
 	if GetCurrentResourceName() == resourceName then
-		print("Recurso " .. resourceName .. " iniciado. Verificando/criando tabelas...")
 		createTables()
-		GetShops()
 	end
 end)
