@@ -1,13 +1,12 @@
------------------For support, scripts, and more----------------
---------------- https://discord.gg/wasabiscripts  -------------
----------------------------------------------------------------
-RegisterNetEvent('wasabi_oxshops:setProductPrice', function(shop, slot)
-    local input = lib.inputDialog(Strings.sell_price, {Strings.amount_input})
+Shops = {}
+---@diagnostic disable: undefined-global
+RegisterNetEvent('mri_Qshops:setProductPrice', function(shop, slot)
+    local input = lib.inputDialog(Strings.sell_price, { Strings.amount_input })
     local price = not input and 0 or tonumber(input[1]) --[[@as number]]
     price = price < 0 and 0 or price
 
     TriggerEvent('ox_inventory:closeInventory')
-    TriggerServerEvent('wasabi_oxshops:setData', shop, slot, math.floor(price))
+    TriggerServerEvent('mri_Qshops:setData', shop, slot, math.floor(price))
     lib.notify({
         title = Strings.success,
         description = (Strings.item_stocked_desc):format(price),
@@ -15,13 +14,15 @@ RegisterNetEvent('wasabi_oxshops:setProductPrice', function(shop, slot)
     })
 end)
 
-local function createBlip(coords, sprite, color, text, scale)
-    local blip = AddBlipForCoord(coords.x, coords.y, coords.z)
-    print(text)
-    SetBlipSprite(blip, sprite)
+
+local function createBlip(blipcoords,blipName,blipSprite,blipCor,blipscale)
+    local text = blipName
+    local blip = AddBlipForCoord(blipcoords.x, blipcoords.y, blipcoords.z)
+    --local blip = AddBlipForCoord(blipconfig.blipcoords)
+    SetBlipSprite(blip,blipSprite)
     SetBlipDisplay(blip, 4)
-    SetBlipScale(blip, scale)
-    SetBlipColour(blip, color)
+    SetBlipScale(blip, blipscale)
+    SetBlipColour(blip, blipCor)
     SetBlipAsShortRange(blip, true)
     BeginTextCommandSetBlipName("STRING")
     AddTextComponentSubstringPlayerName(text)
@@ -29,134 +30,74 @@ local function createBlip(coords, sprite, color, text, scale)
     return blip
 end
 
-CreateThread(function()
-    local Shops = ShopsDataBase()
-    for _, v in pairs(Shops) do
-        if v.blipEnabled ~= 0 then
-            createBlip(v.blipCoords, v.blipDistancia, v.blipCor, v.blipName, v.blipEscala)
-
-        end
-        if v.MenuEnabled == nil then
-            print('passei por aqui blip não foi')
-        end
-    end
-end)
-
-CreateThread(function()
-    local textUI, points = nil, {}
-    local Shops = ShopsDataBase()
-    while not PlayerLoaded do
-        Wait(500)
-    end
+local function mriLoadsShops(Shops)
     for k, v in pairs(Shops) do
-        if not points[k] then
-            points[k] = {}
-        end
-        points[k].stash = lib.points.new({
-            coords = v.armazemCoords,
-            distance = 3.0,
-            shop = v.jobname
-        })
-        points[k].shop = lib.points.new({
-            coords = v.shopCoords,
-            distance = 4.0,
-            shop = v.jobname
-        })
-        points[k].bossMenu = lib.points.new({
-            coords = v.MenuCoords,
-            distance = 3.0,
-            shop = v.jobname
-        })
-    end
-
-    for _, v in pairs(points) do
-        function v.stash:nearby()
-            if not self.isClosest or PlayerData.job.name ~= self.shop then
-                return
-            end
-            if Config.DrawMarkers then
-                DrawMarker(2, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15,
-                    30, 150, 30, 222, false, false, 0, true, false, false, false)
-            end
-            if self.currentDistance < self.distance then
-                if not textUI then
-                    lib.showTextUI('[E] - Accessar Armazem')
-                    textUI = true
-                end
-                if IsControlJustReleased(0, 38) then
-                    exports.ox_inventory:openInventory('stash', self.shop)
-                end
-            end
-        end
-
-        function v.stash:onExit()
-            if not self.isClosest then
-                return
-            end
-            if textUI then
-                lib.hideTextUI()
-                textUI = nil
-            end
-        end
-
-        function v.shop:nearby()
-            if not self.isClosest then
-                return
-            end
-            if Config.DrawMarkers then
-                DrawMarker(2, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15,
-                    30, 150, 30, 222, false, false, 0, true, false, false, false)
-            end
-            if self.currentDistance < self.distance then
-                if not textUI then
-                    lib.showTextUI('[E] - Accessar loja')
-                    textUI = true
-                end
-                if IsControlJustReleased(0, 38) then
-                    exports.ox_inventory:openInventory('shop', {
-                        type = self.shop,
-                        id = 1
-                    })
-                end
-            end
-        end
-
-        function v.shop:onExit()
-            if not self.isClosest then
-                return
-            end
-            if textUI then
-                lib.hideTextUI()
-                textUI = nil
-            end
-        end
-
-        function v.bossMenu:nearby()
-            if not self.isClosest then
-                return
-            end
-            if IsBoss() then
-                if self.currentDistance < self.distance then
-                    if Config.DrawMarkers then
-                        DrawMarker(2, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3,
-                            0.2, 0.15, 30, 150, 30, 222, false, false, 0, true, false, false, false)
+        print(json.encode(Shops), 'mriLoadsShops- banco de dados')
+        print(json.encode(v.target), 'mriLoadsShops')
+        print(json.encode(v.MenuEnabled), 'mriLoadsShops')
+        print(json.encode(v.armazemCoords), 'mriLoadsShops')
+        if v.target then
+            print(json.encode(v.shopCoords), 'mriLoadsShops')
+            exports.ox_target:addSphereZone({
+                coords = v.shopCoords,
+                radius = 0.5,
+                debug = false,
+                options = { {
+                    label = 'Accessar Shop',
+                    icon = 'fa-solid fa-shop',
+                    onSelect = function()
+                        exports.ox_inventory:openInventory('stash', v.jobname)
                     end
-                    if not textUI then
-                        lib.showTextUI('Acessar Boss Menu')
-                        textUI = true
-                    end
-                    if IsControlJustReleased(0, 38) then
-                        OpenBossMenu(PlayerData.job.name)
-                    end
-                end
+                } }
+            })
+        end
+        if v.blipEnabled then
+            print(json.encode(v.blipName), 'blipss')
+            createBlip(v.blipcoords,v.blipName,v.blipSprite,v.blipCor,v.blipscale)
+            if v.MenuEnabled == nil then
+                print('passei por aqui blip não foi')
             end
         end
+        if v.target then
+            exports.ox_target:addSphereZone({
+                coords = v.MenuCoords,
+                radius = 0.5,
+                debug = false,
+                options = { {
+                    label = 'Accessar Menu',
+                    icon = 'fa-solid fa-user-group',
+                    onSelect = function()
+                        exports.qbx_management:OpenBossMenu(PlayerData.job.name)
+                    end,
+                    canInteract = function()
+                        return IsBoss()
+                    end
+                } }
+            })
+        end
 
-        function v.bossMenu:onExit()
-            if textUI then
-                lib.hideTextUI()
-                textUI = nil
-            end
+        if v.target then
+            exports.ox_target:addSphereZone({
+                coords = v.armazemCoords,
+                radius = 0.5,
+                debug = false,
+                options = { {
+                    label = 'Accessar Amazem',
+                    icon = 'fa-solid fa-box',
+                    onSelect = function()
+                        exports.ox_inventory:openInventory('shop', {
+                            type = v.label,
+                            id = 1
+                        })
+                    end
+                } }
+            })
         end
     end
+end
+
+RegisterNetEvent('mri_Qshops:updateshop')
+AddEventHandler('mri_Qshops:updateshop', function(shops)
+    Shops = shops
+    mriLoadsShops(Shops)
 end)

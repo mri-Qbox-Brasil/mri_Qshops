@@ -22,11 +22,9 @@ function IsBoss()
     return PlayerData.job.isboss
 end
 
-function OpenBossMenu()
-    -- TriggerEvent('qb-bossmenu:client:OpenMenu')
-    exports.qbx_management:OpenBossMenu('job')
+function Jobname()
+    return PlayerData.job.name
 end
-
 AddEventHandler('onResourceStart', function(resource)
     if cache.resource == resource then
         Wait(500)

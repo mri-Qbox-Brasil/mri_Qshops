@@ -2,7 +2,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 if not IsQBCore() then return end
 
 function AddMoney(acc, price)
-    exports['qb-management']:AddMoney(acc, price)
+    exports['qbx_management']:AddMoney(acc, price)
 end
 
 QB ={

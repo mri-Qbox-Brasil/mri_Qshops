@@ -1,33 +1,26 @@
------------------For support, scripts, and more----------------
---------------- https://discord.gg/wasabiscripts  -------------
----------------------------------------------------------------
+
 local swapHook, buyHook
-Shops = GlobalState.Shops or {}
 if not IsESX() and not IsQBCore() then
 	error('Framework not detected')
 end
 
-
-CreateThread(function()
-	if IsESX() then
-		for k in pairs(Config.Shops) do
-			TriggerEvent('esx_society:registerSociety', k, k, 'society_'..k, 'society_'..k, 'society_'..k, {type = 'public'})
-		end
-	end
+lib.callback.register('mri_Qshops:server:registerStash', function(source, id, label, slots, weight)
+	return exports.ox_inventory:RegisterStash(id, label, slots, weight)
 end)
 
 CreateThread(function()
 	while GetResourceState('ox_inventory') ~= 'started' do Wait(1000) end
-
+   print(json.encode(Shops), 'server.lua')
 	for k, v in pairs(Shops) do
+		print(json.encode(v.id), 'server.lua')
 		local stash = {
 			id = v.id,
 			label = v.label,
 			slots = 50,
 			weight = 100,
 		}
-		print(stash.label, stash.slots, stash.weight*1000,true)
-		exports.ox_inventory:RegisterStash(stash.label,stash.label, stash.slots, stash.weight*1000)
+		print(stash.label, stash.slots, stash.weight * 1000, true)
+		exports.ox_inventory:RegisterStash(stash.label, stash.label, stash.slots, stash.weight * 1000)
 		local items = exports.ox_inventory:GetInventoryItems(stash.id, false)
 		local stashItems = {}
 		if items and items ~= {} then
@@ -48,11 +41,12 @@ CreateThread(function()
 	end
 
 	swapHook = exports.ox_inventory:registerHook('swapItems', function(payload)
-		for k in pairs(Config.Shops) do
-			if payload.fromInventory == k then
-				TriggerEvent('wasabi_oxshops:refreshShop', k)
-			elseif payload.toInventory == k and tonumber(payload.fromInventory) then
-				TriggerClientEvent('wasabi_oxshops:setProductPrice', payload.fromInventory, k, payload.toSlot)
+		print(json.encode(Shops), 'server.lua')
+		for k, v in pairs(Shops) do
+			if payload.fromInventory == v.jobname then
+				TriggerEvent('mri_qshops:refreshShop', v.jobname)
+			elseif payload.toInventory == v.jobname and tonumber(payload.fromInventory) then
+				TriggerClientEvent('mri_Qshops:setProductPrice', payload.fromInventory, v.jobname, payload.toSlot)
 			end
 		end
 	end, {})
@@ -66,7 +60,7 @@ CreateThread(function()
 	end, {})
 end)
 
-RegisterNetEvent('wasabi_oxshops:refreshShop', function(shop)
+RegisterNetEvent('mri_qshops:refreshShop', function(shop)
 	Wait(250)
 	local items = exports.ox_inventory:GetInventoryItems(shop, false)
 	local stashItems = {}
@@ -74,22 +68,23 @@ RegisterNetEvent('wasabi_oxshops:refreshShop', function(shop)
 		if v and v.name then
 			local metadata = v.metadata
 			if metadata.shopData then
-				stashItems[#stashItems + 1] = { name = v.name, metadata = metadata, count = v.count, price = metadata.shopData.price }
+				stashItems[#stashItems + 1] = { name = v.name, metadata = metadata, count = v.count, price = metadata
+				.shopData.price }
 			end
 		end
 	end
 	for k, v in pairs(Shops) do
-	exports.ox_inventory:RegisterShop(shop, {
-		name = v.label,
-		inventory = stashItems,
-		locations = {
-			v.shop_coords,
-		}
-	})
-  end
+		exports.ox_inventory:RegisterShop(shop, {
+			name = v.label,
+			inventory = stashItems,
+			locations = {
+				v.shop_coords,
+			}
+		})
+	end
 end)
 
-RegisterNetEvent('wasabi_oxshops:setData', function(shop, slot, price)
+RegisterNetEvent('mri_Qshops:setData', function(shop, slot, price)
 	local item = exports.ox_inventory:GetSlot(shop, slot)
 	if not item then return end
 
@@ -100,13 +95,13 @@ RegisterNetEvent('wasabi_oxshops:setData', function(shop, slot, price)
 	}
 
 	exports.ox_inventory:SetMetadata(shop, slot, metadata)
-	TriggerEvent('wasabi_oxshops:refreshShop', shop)
+	TriggerEvent('mri_qshops:refreshShop', shop)
 end)
 
 if GetResourceState('mri_Qbox') ~= 'started' then
-	lib.addCommand('shopmenu',{
+	lib.addCommand('shopmenu', {
 		help = 'menu de shop menu',
-	}, function(source, args,  raw)	
-       lib.callback('mri_shops:shopmenu', source)
-   end)
+	}, function(source, args, raw)
+		lib.callback('mri_shops:shopmenu', source)
+	end)
 end

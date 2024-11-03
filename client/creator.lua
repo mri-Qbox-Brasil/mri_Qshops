@@ -1,50 +1,4 @@
-function ShopsDataBase()
-    Shops = GlobalState.Shops or {}
-    shop = {}
-    for k, v in pairs(Shops) do
-        shop[#shop + 1] = {
-            id = v.id,
-            label = v.id,
-            jobname = v.jobname,
-            blipName = v.blipName,
-            blipCoords = v.blipCoords,
-            blipDistancia = v.blipDistancia,
-            blipCor = v.blipCor,
-            blipEnabled = v.blipEnabled,
-            blipEscala = v.blipEscala,
-            MenuCoords = v.MenuCoords,
-            MenuDistancia = v.MenuDistancia,
-            MenuEnabled = v.MenuEnabled,
-            armazemCoords = v.armazemCoords,
-            armazemDistancia = v.armazemDistancia,
-            shopCoords = v.shopCoords,
-            shopDistancia = v.shopDistancia
-        }
-        print(json.encode(shop))
-    
-    end
-    return shop
-end
-
-local newShops = {
-    id = nil,
-    label = nil,
-    jobname = nil,
-    blipName = nil,
-    blipCoords = nil,
-    blipDistancia = nil,
-    blipCor = nil,
-    blipEnabled = nil,
-    blipEscala = nil,
-    MenuCoords = nil,
-    MenuDistancia = nil,
-    MenuEnabled = nil,
-    armazemCoords = nil,
-    armazemDistancia = nil,
-    shopCoords = nil,
-    shopDistancia = nil
-
-}
+local shops = {}
 
 function GetGroupGrades(group)
     local grades = {}
@@ -77,46 +31,44 @@ function GetBaseGroups(named)
     return groups
 end
 
-function CreatorMenu(name)
-    lib.registerContext({
+local function creatorMenu(name)
+   local ctx = {
         id = 'menu_creator',
         menu = 'menu_gerencial',
         title = 'Gerenciar Menu',
-        options = {{
+        options = { {
             title = 'Criar novo shop',
             description = 'Crie um shop ou loja',
             icon = 'shop',
             iconAnimation = 'fade',
-            arnil = true,
             onSelect = function()
                 Mrishops(name)
             end
         }, {
-            title = 'Listar SHOPS',
+            title = 'Listar shops',
             description = 'Lista shops existentes',
             icon = 'list',
             iconAnimation = 'fade',
-            arnil = true,
             onSelect = function()
                 ListaMenu(name)
             end
-        }}
-    })
-    lib.showContext('menu_creator')
+        } }
+    }
+    lib.registerContext(ctx)
+    lib.showContext(ctx.id)
 end
 
 if GetResourceState("mri_Qbox") == 'started' then
     exports['mri_Qbox']:AddManageMenu({
-        title = 'SHOPS',
+        title = 'shops',
         description = 'Crie um shop ou loja.',
         icon = 'shop',
         iconAnimation = 'fade',
-        arnil = true,
-        onSelectFunction = CreatorMenu
+        onSelectFunction = creatorMenu
     })
 else
-    lib.callback.register('mri_shops:shopmenu', function()
-        CreatorMenu()
+    TriggerServerEvent('mri_shops:shopmenu', function()
+        creatorMenu()
         return true
     end)
 end
@@ -126,12 +78,11 @@ function Menuset(name)
         id = 'config_menu',
         menu = 'menu_gerencial',
         title = 'Menu Configuração',
-        options = {{
+        options = { {
             title = 'Definir a bancada',
             description = name,
             icon = 'cart-shopping',
             iconAnimation = 'fade',
-            arnil = true,
             onSelect = function()
                 Bancadashop(name)
             end
@@ -140,7 +91,6 @@ function Menuset(name)
             icon = 'computer',
             description = name,
             iconAnimation = 'fade',
-            arnil = true,
             onSelect = function()
                 Bossmenu(name)
             end
@@ -149,7 +99,6 @@ function Menuset(name)
             icon = 'location-dot',
             description = name,
             iconAnimation = 'fade',
-            arnil = true,
             onSelect = function()
                 Armazem(name)
             end
@@ -158,7 +107,6 @@ function Menuset(name)
             icon = 'boxes-packing',
             description = name,
             iconAnimation = 'fade',
-            arnil = true,
             onSelect = function()
                 MriBlips(name)
             end
@@ -167,62 +115,58 @@ function Menuset(name)
             icon = 'trash',
             description = name,
             iconAnimation = 'fade',
-            arnil = true,
             onSelect = function()
                 DeletarShop(name)
             end
-        }}
+        } }
     })
     lib.showContext('config_menu')
 end
 
 function Bancadashop(name)
-    local shopinput = lib.inputDialog('Menu de bancadashop', {{
+    local input = lib.inputDialog('Menu de bancadashop', { {
         type = 'number',
         label = 'digite numero de distancia',
         required = true
-    }})
+    } })
 
-    if shopinput ~= nil then
+    if input then
         local result = exports.mri_Qbox:GetRayCoords()
-        local ShopBancada = {
-            shopDistancia = shopinput[1],
-            shopCoords = result
+        shops = {
+        label = name,
+        shopsprite = input[1],
+        shopCoords = result
         }
-        print(json.encode(Shop))
-        TriggerServerEvent('mri-qshops:BancadashopAtualizacaoShop', ShopBancada, name)
-        -- TriggerServerEvent('mri-qshops:BancadashopAtualizacaoShop', Shop,name)
+        TriggerServerEvent('mri_Qshops:BancadashopUpdateShop', shops, name)
     end
 end
 
-
 function Armazem(name)
-    local shopinput = lib.inputDialog('Menu de Armazem', {{
+    local shopinput = lib.inputDialog('Menu de Armazem', { {
         type = 'number',
-        label = 'digite numero de shopDistancia',
+        label = 'digite numero de shopsprite',
         required = true
     }, {
         type = 'checkbox',
         label = 'Use boosmenu',
         required = true
-    }})
+    } })
 
-    if shopinput ~= nil then
+    if shopinput then
         local result = exports.mri_Qbox:GetRayCoords()
-        local Shop = {
-            armazemDistancia = shopinput[1],
+        shops = {
+            label = name,
+            armazemsprite = shopinput[1],
+            MenuEnabled = shopinput[2],
             armazemCoords = result
         }
-
-        print(json.encode(Shop))
-        TriggerServerEvent('mri-qshops:ArmazemAtualizacaoShop', Shop, name)
-
-        -- print(result)
+        TriggerServerEvent('mri_Qshops:ArmazemUpdateShop', shops)
+        print(json.encode(shops),'armazem')
     end
 end
 
 function Bossmenu(name)
-    local shopinput = lib.inputDialog('Menu de boosmenu', {{
+    local shopinput = lib.inputDialog('Menu de boosmenu', { {
         type = 'number',
         label = 'digite numero de Distancia',
         required = true
@@ -230,61 +174,58 @@ function Bossmenu(name)
         type = 'checkbox',
         label = 'Use boosmenu',
         required = true
-    }})
-    if shopinput ~= nil then
+    } })
+    if shopinput then
         local result = exports.mri_Qbox:GetRayCoords()
-        local Shop = {
+        shops = {
+            label = name,
             MenuEnabled = shopinput[2],
-            MenuDistancia = shopinput[1],
+            Menusprite = shopinput[1],
             MenuCoords = result
         }
-
-        print(json.encode(Shop))
-        TriggerServerEvent('mri-qshops:BossmenuAtualizacaoShop', Shop, name)
-
-        -- print(result)
+        TriggerServerEvent('mri-Qshops:BossmenuUpdateShop', shops)
+        print(json.encode(shops),'bossmenu')
     end
 end
 
 function MriBlips(name)
-    local shopinput = lib.inputDialog('Menu de blip', {{
+    local shopinput = lib.inputDialog('Menu de blip', { {
         type = 'input',
         label = 'Nome do blip',
         description = 'Digite o nome do blip',
-        required = true,
-        min = 1,
-        max = 40
+        required = true
     }, {
-        type = 'color',
+        type = 'number',
         label = 'cor do blip',
-        default = '#eb4034',
         required = true
     }, {
         type = 'checkbox',
         label = 'Use Blip',
         required = true
     }, {
-        type = 'number',
+        type = 'input',
         label = 'digite numero de sprite',
         required = true
     }, {
-        type = 'number',
+        type = 'input',
         label = 'digite numero de scala',
         required = true
-    }})
-              
+    } })
+
     if shopinput ~= nil then
-    local result = exports.mri_Qbox:GetRayCoords()
-        local Shop = {
+        local result = GetEntityCoords(cache.ped)
+        shops = {
+            label = name,
             blipName = shopinput[1],
             blipCor = shopinput[2],
             blipEnabled = shopinput[3],
-            blipDistancia = shopinput[4],
-            blipEscala = shopinput[5],
-            blipCoords = result
+            blipSprite = shopinput[4],
+            blipscale = shopinput[5],
+            blipcoords = result
         }
-        print(json.encode(Shop))
-        TriggerServerEvent('mri-qshops:BlipAtualizacaoShop', Shop, name)
+        --TriggerServerEvent('mri_qshops:BlipUpdateShop', Shop, name)
+        TriggerServerEvent('mri_Qshops:BlipUpdateShop', shops)
+        print(json.encode(shops),'blip')
 
     end
 end
@@ -298,25 +239,12 @@ function DeletarShop(name)
     })
 
     if result == 'confirm' then
-        TriggerServerEvent('mri-qshops:DeletarShop', name)
-        TriggerServerEvent('mri-Qshops:SelectStartShop', -1)
+        TriggerServerEvent('mri_Qshops:deleteShop', name)
     end
 end
 
 function Mrishops(name)
-    local key = nil
-    if name and name.key then
-        key = name.key
-    end
-    local shop = {}
-    if key then
-        shop = Shops[key]
-
-    else
-        table.clone(newShops, shop)
-    end
-
-    local shopinput = lib.inputDialog('Menu de Criação', {{
+    local shopinput = lib.inputDialog('Menu de Criação', { {
         type = 'input',
         label = 'Nome do shop',
         description = 'Digite o nome do shop',
@@ -330,30 +258,31 @@ function Mrishops(name)
         options = GetBaseGroups(),
         required = true,
         searchable = true
-    }})
-    if not shopinput then
-        return
-    end
+    }, {
+        type = 'checkbox',
+        label = 'Use target',
+        required = true
+    }, {
+        type = 'checkbox',
+        label = 'Use drawmaker',
+        required = true
+    } })
+
     if shopinput ~= nil then
-        local dadoshop = {
+        shops = {
             label = shopinput[1],
-            jobname = shopinput[2]
+            jobname = shopinput[2],
+            target = shopinput[3],
+            drawmaker = shopinput[4]
         }
-        if not key then
-            key = #Shops + 1
-            Shops[key] = shop
-        end
-        Shops[key] = shop
-        TriggerServerEvent('mri-qshops:InserirShop', dadoshop)
-        TriggerServerEvent('mri-Qshops:SelectStartShop')
+        TriggerServerEvent('mri-qshops:insertShop', shops)
     else
         print('erro input')
     end
-    CreatorMenu(name)
+    creatorMenu(name)
 end
 
 function ListaMenu(name)
-    local shopData = {}
     local shopList = {}
     for k, v in pairs(Shops) do
         table.insert(shopList, {
@@ -377,14 +306,8 @@ function ListaMenu(name)
     lib.registerContext({
         id = 'Lista_menu',
         menu = 'menu_gerencial',
-        title = 'Lista de SHOPS',
+        title = 'Lista de shops',
         options = shopList
     })
     lib.showContext('Lista_menu')
 end
-
-RegisterNetEvent("mri-Qshops:carregarshop", function()
-    ShopsDataBase()
-    print('Shops atualizados indo para database')
-end)
-
