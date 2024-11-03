@@ -22,6 +22,11 @@ function IsBoss()
     return PlayerData.job.isboss
 end
 
+function OpenBossMenu()
+    -- TriggerEvent('qb-bossmenu:client:OpenMenu')
+    exports.qbx_management:OpenBossMenu('job')
+end
+
 function Jobname()
     return PlayerData.job.name
 end

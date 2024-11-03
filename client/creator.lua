@@ -58,21 +58,6 @@ local function creatorMenu(name)
     lib.showContext(ctx.id)
 end
 
-if GetResourceState("mri_Qbox") == 'started' then
-    exports['mri_Qbox']:AddManageMenu({
-        title = 'shops',
-        description = 'Crie um shop ou loja.',
-        icon = 'shop',
-        iconAnimation = 'fade',
-        onSelectFunction = creatorMenu
-    })
-else
-    TriggerServerEvent('mri_shops:shopmenu', function()
-        creatorMenu()
-        return true
-    end)
-end
-
 function Menuset(name)
     lib.registerContext({
         id = 'config_menu',
@@ -124,53 +109,30 @@ function Menuset(name)
 end
 
 function Bancadashop(name)
-    local input = lib.inputDialog('Menu de bancadashop', { {
-        type = 'number',
-        label = 'digite numero de distancia',
-        required = true
-    } })
-
-    if input then
+    if name then
         local result = exports.mri_Qbox:GetRayCoords()
         shops = {
         label = name,
-        shopsprite = input[1],
         shopCoords = result
         }
-        TriggerServerEvent('mri_Qshops:BancadashopUpdateShop', shops, name)
+        TriggerServerEvent('mri-Qshops:UpdateShop', shops)
     end
 end
 
 function Armazem(name)
-    local shopinput = lib.inputDialog('Menu de Armazem', { {
-        type = 'number',
-        label = 'digite numero de shopsprite',
-        required = true
-    }, {
-        type = 'checkbox',
-        label = 'Use boosmenu',
-        required = true
-    } })
-
-    if shopinput then
+    if name then
         local result = exports.mri_Qbox:GetRayCoords()
         shops = {
             label = name,
-            armazemsprite = shopinput[1],
-            MenuEnabled = shopinput[2],
             armazemCoords = result
         }
-        TriggerServerEvent('mri_Qshops:ArmazemUpdateShop', shops)
+        TriggerServerEvent('mri-Qshops:UpdateShop', shops)
         print(json.encode(shops),'armazem')
     end
 end
 
 function Bossmenu(name)
     local shopinput = lib.inputDialog('Menu de boosmenu', { {
-        type = 'number',
-        label = 'digite numero de Distancia',
-        required = true
-    }, {
         type = 'checkbox',
         label = 'Use boosmenu',
         required = true
@@ -179,11 +141,10 @@ function Bossmenu(name)
         local result = exports.mri_Qbox:GetRayCoords()
         shops = {
             label = name,
-            MenuEnabled = shopinput[2],
-            Menusprite = shopinput[1],
+            MenuBossEnabled = shopinput[2],
             MenuCoords = result
         }
-        TriggerServerEvent('mri-Qshops:BossmenuUpdateShop', shops)
+        TriggerServerEvent('mri-Qshops:UpdateShop', shops)
         print(json.encode(shops),'bossmenu')
     end
 end
@@ -224,7 +185,7 @@ function MriBlips(name)
             blipcoords = result
         }
         --TriggerServerEvent('mri_qshops:BlipUpdateShop', Shop, name)
-        TriggerServerEvent('mri_Qshops:BlipUpdateShop', shops)
+        TriggerServerEvent('mri-Qshops:UpdateShop', shops)
         print(json.encode(shops),'blip')
 
     end
@@ -310,4 +271,19 @@ function ListaMenu(name)
         options = shopList
     })
     lib.showContext('Lista_menu')
+end
+
+if GetResourceState("mri_Qbox") == 'started' then
+    exports['mri_Qbox']:AddManageMenu({
+        title = 'shops',
+        description = 'Crie um shop ou loja.',
+        icon = 'shop',
+        iconAnimation = 'fade',
+        onSelectFunction = creatorMenu
+    })
+else
+    TriggerServerEvent('mri_shops:shopmenu', function()
+        creatorMenu()
+        return true
+    end)
 end
