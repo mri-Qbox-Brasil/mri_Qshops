@@ -172,8 +172,10 @@ end
 
 AddEventHandler('onResourceStart', function(resourceName)
     if GetCurrentResourceName() == resourceName then
+
         print("Recurso " .. resourceName .. " iniciado. Verificando/criando tabelas...")
         createTables()
         GetShops()
+
     end
 end)
