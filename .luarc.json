@@ -1,6 +1,0 @@
-{
-    "workspace.library": [],
-    "diagnostics.disable": [
-        "undefined-field"
-    ]
-}

@@ -26,6 +26,8 @@ function CreateTable()
    ]])
 end
 
+CreateTable()
+
 local function dispatchEvents(source, response)
     TriggerClientEvent('mri_Qshops:updateshop', -1, Shops)
     if response then
@@ -170,6 +172,5 @@ AddEventHandler('onResourceStart', function(resourceName)
     Wait(400)
     if GetCurrentResourceName() == resourceName then
         getShops()
-        print('ssksksk')
     end
 end)
