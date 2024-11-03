@@ -18,7 +18,6 @@ end)
 local function createBlip(blipcoords, blipName, blipSprite, blipCor, blipscale)
     local text = blipName
     local blip = AddBlipForCoord(blipcoords.x, blipcoords.y, blipcoords.z)
-    --local blip = AddBlipForCoord(blipconfig.blipcoords)
     SetBlipSprite(blip, blipSprite)
     SetBlipDisplay(blip, 4)
     SetBlipScale(blip, blipscale)
@@ -30,8 +29,7 @@ local function createBlip(blipcoords, blipName, blipSprite, blipCor, blipscale)
     return blip
 end
 
-local function mriMenuShops()
-    local Shops = lib.callback.await('mri_Qshops:server:GetShops')
+local function mriMenuShops(Shops)
     local textUI, points = nil, {}
     for k, v in pairs(Shops) do
         local job = v.jobname

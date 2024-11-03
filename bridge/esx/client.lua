@@ -4,7 +4,8 @@ local ESX = exports['es_extended']:getSharedObject()
 
 RegisterNetEvent('esx:playerLoaded', function(xPlayer)
     PlayerData = xPlayer
-    exports.mri_Qshops:mriMenuShops()
+    local shops = lib.callback.await('mri_Qshops:server:GetShops')
+    exports.mri_Qshops:mriMenuShops(shops)
 end)
 
 RegisterNetEvent('esx:onPlayerLogout', function()
@@ -29,6 +30,7 @@ AddEventHandler('onResourceStart', function(resource)
     if cache.resource == resource then
         Wait(500)
         PlayerData = ESX.GetPlayerData()
-        exports.mri_Qshops:mriMenuShops()
+        local shops = lib.callback.await('mri_Qshops:server:GetShops')
+        exports.mri_Qshops:mriMenuShops(shops)
     end
 end)

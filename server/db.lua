@@ -1,4 +1,4 @@
-Shops = {}
+SHOPS_SERVER = {}
 
 RegisterNetEvent("mri-qshops:insertShop", function(data)
 	local source = source
@@ -114,7 +114,7 @@ function GetShops(source, response)
 	local shops = {}
 	if result and #result > 0 then
 		for k, v in ipairs(result) do
-			print(json.encode(k))
+			print(json.encode(k), "teste")
 			local sho = {
 				id = v.id,
 				label = v.label,
@@ -136,12 +136,12 @@ function GetShops(source, response)
 			shops[k] = sho
 		end
 	end
-	Shops = shops
-	TriggerClientEvent("mri_Qshops:updatesDBshop", -1, Shops)
+	SHOPS_SERVER = shops
+	TriggerClientEvent("mri_Qshops:updatesDBshop", -1, SHOPS_SERVER)
 	if response then
 		TriggerClientEvent("ox_lib:notify", source, response)
 	end
-	return Shops
+	return SHOPS_SERVER
 end
 exports("GetShops", GetShops)
 
