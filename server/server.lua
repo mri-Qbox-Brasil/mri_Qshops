@@ -20,7 +20,7 @@ CreateThread(function()
 			weight = 100,
 		}
 		print(stash.label, stash.slots, stash.weight * 1000, true)
-		exports.ox_inventory:RegisterStash(stash.label, stash.label, stash.slots, stash.weight * 1000)
+		exports.ox_inventory:RegisterStash(v.jobname, stash.label, stash.slots, stash.weight * 1000)
 		local items = exports.ox_inventory:GetInventoryItems(stash.id, false)
 		local stashItems = {}
 		if items and items ~= {} then

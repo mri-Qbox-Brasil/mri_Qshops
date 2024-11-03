@@ -35,30 +35,38 @@ local function mriMenuShops(Shops)
     while not PlayerLoaded do Wait(500) end
     for k, v in pairs(Shops) do
         local job = v.jobname
-        local armazemcoords = vector3(v.armazemCoords.x, v.armazemCoords.y, v.armazemCoords.z)
-        local shopcoords = vector3(v.shopCoords.x, v.shopCoords.y, v.shopCoords.z)
-        local menucoords = vector3(v.MenuCoords.x, v.MenuCoords.y, v.MenuCoords.z)
+        local armazemcoords = v.armazemCoords and vector3(v.armazemCoords.x, v.armazemCoords.y, v.armazemCoords.z) or nil
+        local shopcoords = v.shopCoords and vector3(v.shopCoords.x, v.shopCoords.y, v.shopCoords.z) or nil
+        local menucoords = v.MenuCoords and vector3(v.MenuCoords.x, v.MenuCoords.y, v.MenuCoords.z) or nil
         if not points[job] then points[job] = {} end
-        points[job].stash = lib.points.new({
-            coords = armazemcoords,
-            distance = 4.0,
-            shop = job
-        })
-        points[job].shop = lib.points.new({
-            coords = shopcoords,
-            distance = 4.0,
-            shop = job
-        })
-        -- if v.bossMenu.enabled then
-        points[job].bossMenu = lib.points.new({
-            coords = menucoords,
-            distance = 3.0,
-            shop = job
-        })
-        --end
+
+        if armazemcoords then
+            points[job].stash = lib.points.new({
+                coords = armazemcoords,
+                distance = 4.0,
+                shop = job
+            })
+        end
+    
+        if v.shopCoords then
+            points[job].shop = lib.points.new({
+                coords = shopcoords,
+                distance = 4.0,
+                shop = job
+            })
+        end
+
+        if v.MenuCoords then
+            points[job].bossMenu = lib.points.new({
+                coords = menucoords,
+                distance = 3.0,
+                shop = job
+            })
+        end
     end
 
     for _, v in pairs(points) do
+        if not v.stash then return end
         function v.stash:nearby()
             if not self.isClosest or PlayerData.job.name ~= self.shop then return end
             if v.blipEnabled then
@@ -67,7 +75,7 @@ local function mriMenuShops(Shops)
             end
             if self.currentDistance < self.distance then
                 if not textUI then
-                    lib.showTextUI('[E] - Accessar Armazem')
+                    lib.showTextUI('[E] - Acessar Armazem')
                     textUI = true
                 end
                 if IsControlJustReleased(0, 38) then
@@ -92,7 +100,7 @@ local function mriMenuShops(Shops)
             end
             if self.currentDistance < self.distance then
                 if not textUI then
-                    lib.showTextUI('[E] - Accessar loja')
+                    lib.showTextUI('[E] - Acessar loja')
                     textUI = true
                 end
                 if IsControlJustReleased(0, 38) then
