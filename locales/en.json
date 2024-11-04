@@ -1,0 +1,8 @@
+{
+    "amount": "Amount",
+    "price_value": "Price value",
+    "sell_price": "Sell Price",
+    "inventory": "Inventory",
+    "success": "Success",
+    "item_stocked_desc": "You stocked an item for $%s!"
+}

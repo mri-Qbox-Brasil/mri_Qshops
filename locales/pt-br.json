@@ -1,0 +1,8 @@
+{
+    "amount": "Quantidade",
+    "price_value": "Valor do Preço",
+    "sell_price": "Preço de Venda",
+    "inventory": "Inventário",
+    "success": "Sucesso",
+    "item_stocked_desc": "Você armazenou um item por R$%s!"
+}
