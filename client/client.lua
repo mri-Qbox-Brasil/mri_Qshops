@@ -1,5 +1,4 @@
 Shops = {}
----@diagnostic disable: undefined-global
 RegisterNetEvent('mri_Qshops:setProductPrice', function(shop, slot)
     local input = lib.inputDialog(Strings.sell_price, { Strings.amount_input })
     local price = not input and 0 or tonumber(input[1])
@@ -13,7 +12,6 @@ RegisterNetEvent('mri_Qshops:setProductPrice', function(shop, slot)
         type = 'success'
     })
 end)
-
 
 local function createBlip(blipcoords, blipname, blipsprite, blipcolor, blipscale)
     local text = blipname
@@ -144,8 +142,7 @@ local function mriMenuShops(Shops)
 end
 exports('mriMenuShops', mriMenuShops)
 
-RegisterNetEvent('mri_Qshops:updatesDBshop')
-AddEventHandler('mri_Qshops:updatesDBshop', function(shops)
+RegisterNetEvent('mri_Qshops:updatesDBshop', function(shops)
     Shops = shops
     if Shops == nil then
         return

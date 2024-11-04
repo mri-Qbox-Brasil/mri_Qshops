@@ -4,12 +4,12 @@ lua54 'yes'
 use_experimental_fxv2_oal 'yes'
 
 description 'mri_Qshops'
-credits 'wasabirobby#5110'
+credits 'felps.j.j, mur4i, wasabirobby#5110'
 version '1.0.4'
 
 shared_scripts {
     '@ox_lib/init.lua',
-    'configuration/*.lua',
+    'config/*.lua',
     'bridge/framework.lua'
 }
 

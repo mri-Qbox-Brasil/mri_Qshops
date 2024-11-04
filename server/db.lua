@@ -2,7 +2,7 @@ SHOPS_SERVER = {}
 
 RegisterNetEvent("mri_Qshops:insertShop", function(data)
 	local source = source
-	if not IsPlayerAceAllowed(source, "admin") then 
+	if not IsPlayerAceAllowed(source, "admin") then
 		return TriggerClientEvent("ox_lib:notify", source, {
 			type = "error",
 			description = "Você não tem permissão para usar este comando.",
@@ -83,15 +83,14 @@ RegisterNetEvent("mri_Qshops:UpdateShop", function(Shop)
 
 	if Shop.menucoords then
 		updateShopField(
-			"UPDATE mri_qshops SET menucoords = ?, menuenabled = ? WHERE label = ?",
-			{ json.encode(Shop.menucoords), Shop.menuenabled, Shop.label }
+			"UPDATE mri_qshops SET menucoords = ? WHERE label = ?",
+			{ json.encode(Shop.menucoords), Shop.label }
 		)
 	end
 
 	if Shop.blipenabled then
-		updateShopField(
-			"UPDATE mri_qshops SET blipname = ?, blipcolor = ?, blipenabled = ?, blipsprite = ?, blipscale = ?, blipcoords = ? WHERE label = ?",
-			{
+		updateShopField("UPDATE mri_qshops SET blipdata = ? WHERE label = ?", {
+			json.encode({
 				Shop.blipname,
 				Shop.blipcolor,
 				Shop.blipenabled,
@@ -99,8 +98,8 @@ RegisterNetEvent("mri_Qshops:UpdateShop", function(Shop)
 				Shop.blipscale,
 				json.encode(Shop.blipcoords),
 				Shop.label,
-			}
-		)
+			}),
+		})
 	end
 
 	GetShops(source, response)
@@ -116,16 +115,9 @@ function GetShops(source, response)
 				id = v.id,
 				label = v.label,
 				jobname = v.jobname,
-				target = v.target,
-				drawmaker = v.drawmaker,
-				blipname = v.blipname,
-				blipcoords = json.decode(v.blipcoords),
-				blipsprite = tonumber(v.blipsprite),
-				blipcolor = tonumber(v.blipcolor),
-				blipenabled = v.blipenabled,
-				blipscale = tonumber(v.blipscale),
+				interaction = v.interaction,
+				blipdata = json.decode(v.blipdata),
 				menucoords = json.decode(v.menucoords),
-				menuenabled = v.menuenabled,
 				storagecoords = json.decode(v.storagecoords),
 				shopcoords = json.decode(v.shopcoords),
 			}
