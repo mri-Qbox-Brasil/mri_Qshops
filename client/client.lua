@@ -32,6 +32,7 @@ local function mriMenuShops(Shops)
 	local textUI, points = nil, {}
 	for k, v in pairs(Shops) do
 		local job = v.jobname
+		local interaction = v.interaction
 		local armazemcoords = v.storagecoords and vector3(v.storagecoords.x, v.storagecoords.y, v.storagecoords.z)
 			or nil
 		local shopcoords = v.shopcoords and vector3(v.shopcoords.x, v.shopcoords.y, v.shopcoords.z) or nil
@@ -45,6 +46,7 @@ local function mriMenuShops(Shops)
 				coords = armazemcoords,
 				distance = 4.0,
 				shop = job,
+				interaction = interaction,
 			})
 		end
 
@@ -53,6 +55,7 @@ local function mriMenuShops(Shops)
 				coords = shopcoords,
 				distance = 4.0,
 				shop = job,
+				interaction = interaction,
 			})
 		end
 
@@ -61,6 +64,7 @@ local function mriMenuShops(Shops)
 				coords = menucoords,
 				distance = 3.0,
 				shop = job,
+				interaction = interaction,
 			})
 		end
 	end
@@ -103,7 +107,9 @@ local function mriMenuShops(Shops)
 			end
 			if self.currentDistance < self.distance then
 				if not textUI then
-					lib.showTextUI("[E] - Acessar Armazem")
+					lib.showTextUI("[E] - Abrir Estoque", {
+						icon = "box",
+					})
 					textUI = true
 				end
 				if IsControlJustReleased(0, 38) then
@@ -126,7 +132,7 @@ local function mriMenuShops(Shops)
 			if not self.isClosest then
 				return
 			end
-			if Config.DrawMarkers then
+			if v.interaction == "drawmarker" then
 				DrawMarker(
 					2,
 					self.coords.x,
@@ -156,7 +162,9 @@ local function mriMenuShops(Shops)
 			end
 			if self.currentDistance < self.distance then
 				if not textUI then
-					lib.showTextUI("[E] - Acessar loja")
+					lib.showTextUI("[E] - Abrir Loja", {
+						icon = "shop",
+					})
 					textUI = true
 				end
 				if IsControlJustReleased(0, 38) then
@@ -181,7 +189,7 @@ local function mriMenuShops(Shops)
 			end
 			if IsBoss() then
 				if self.currentDistance < self.distance then
-					if Config.DrawMarkers then
+					if v.interaction == "drawmarker" then
 						DrawMarker(
 							2,
 							self.coords.x,
@@ -210,7 +218,9 @@ local function mriMenuShops(Shops)
 						)
 					end
 					if not textUI then
-						lib.showTextUI("Acessar Boss Menu")
+						lib.showTextUI("[E] - Bossmenu", {
+							icon = "crown",
+						})
 						textUI = true
 					end
 					if IsControlJustReleased(0, 38) then

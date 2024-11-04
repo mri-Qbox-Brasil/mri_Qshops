@@ -18,14 +18,12 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
 		Wait(400)
 	end
 	for k, v in pairs(shops) do
-		print(json.encode(v.jobname), "server.lua")
 		local stash = {
 			id = v.jobname,
 			label = v.label,
 			slots = 50,
 			weight = 100,
 		}
-		print(stash.label, stash.slots, stash.weight * 1000, true)
 		exports.ox_inventory:RegisterStash(v.jobname, stash.label, stash.slots, stash.weight * 1000)
 		local items = exports.ox_inventory:GetInventoryItems(stash.id, false)
 		local stashItems = {}
@@ -61,7 +59,7 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
 		local metadata = payload.metadata
 		if metadata.shopData then
 			exports.ox_inventory:RemoveItem(metadata.shopData.shop, payload.itemName, payload.count)
-			AddMoney(metadata.shopData.shop, metadata.shopData.price)
+			AddMoney(metadata.shopData.shop, metadata.shopData.price, string.format("Venda de x%s %s por R$%s", payload.count, payload.itemName, metadata.shopData.price))
 		end
 	end, {})
 end)
