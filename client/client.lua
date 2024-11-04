@@ -2,7 +2,7 @@ Shops = {}
 ---@diagnostic disable: undefined-global
 RegisterNetEvent('mri_Qshops:setProductPrice', function(shop, slot)
     local input = lib.inputDialog(Strings.sell_price, { Strings.amount_input })
-    local price = not input and 0 or tonumber(input[1]) --[[@as number]]
+    local price = not input and 0 or tonumber(input[1])
     price = price < 0 and 0 or price
 
     TriggerEvent('ox_inventory:closeInventory')
@@ -115,7 +115,6 @@ local function mriMenuShops(Shops)
             end
         end
 
-        --if v?.bossMenu then
         function v.bossMenu:nearby()
             if not self.isClosest then return end
             if IsBoss() then

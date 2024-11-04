@@ -1,8 +1,7 @@
 SHOPS_SERVER = {}
 
-RegisterNetEvent("mri-qshops:insertShop", function(data)
+RegisterNetEvent("mri_Qshops:insertShop", function(data)
 	local source = source
-
 	if not IsPlayerAceAllowed(source, "admin") then 
 		return TriggerClientEvent("ox_lib:notify", source, {
 			type = "error",
@@ -13,7 +12,7 @@ RegisterNetEvent("mri-qshops:insertShop", function(data)
 		type = "success",
 		description = "Sucesso ao salvar!",
 	}
-	local sql = "INSERT INTO `mri_Qshops` (%s) VALUES (%s)"
+	local sql = "INSERT INTO `mri_qshops` (%s) VALUES (%s)"
 	local columns = ""
 	local placeholders = ""
 	local params = {}
@@ -30,7 +29,6 @@ RegisterNetEvent("mri-qshops:insertShop", function(data)
 	end
 
 	local result = MySQL.Sync.execute(string.format(sql, columns, placeholders), params)
-	print(string.format(sql, columns, placeholders), params, "insertshop")
 	if result <= 0 then
 		response.type = "error"
 		response.description = "Erro ao enviar dados."
@@ -40,7 +38,7 @@ end)
 
 RegisterNetEvent("mri_Qshops:deleteShop", function(shoplabel)
 	local source = source
-	local sql = "DELETE FROM mri_Qshops WHERE label = ?"
+	local sql = "DELETE FROM mri_qshops WHERE label = ?"
 	local response = {
 		type = "success",
 		description = "Shop excluido!",
@@ -54,7 +52,7 @@ RegisterNetEvent("mri_Qshops:deleteShop", function(shoplabel)
 	GetShops(source, response)
 end)
 
-RegisterNetEvent("mri-Qshops:UpdateShop", function(Shop)
+RegisterNetEvent("mri_Qshops:UpdateShop", function(Shop)
 	local response = {
 		type = "success",
 		description = "Sucesso ao Update!",
@@ -71,28 +69,28 @@ RegisterNetEvent("mri-Qshops:UpdateShop", function(Shop)
 
 	if Shop.shopCoords then
 		updateShopField(
-			"UPDATE mri_Qshops SET shopCoords = ? WHERE label = ?",
+			"UPDATE mri_qshops SET shopCoords = ? WHERE label = ?",
 			{ json.encode(Shop.shopCoords), Shop.label }
 		)
 	end
 
 	if Shop.armazemCoords then
 		updateShopField(
-			"UPDATE mri_Qshops SET armazemCoords = ? WHERE label = ?",
+			"UPDATE mri_qshops SET armazemCoords = ? WHERE label = ?",
 			{ json.encode(Shop.armazemCoords), Shop.label }
 		)
 	end
 
 	if Shop.MenuCoords then
 		updateShopField(
-			"UPDATE mri_Qshops SET MenuCoords = ?, MenuBossEnabled = ? WHERE label = ?",
+			"UPDATE mri_qshops SET MenuCoords = ?, MenuBossEnabled = ? WHERE label = ?",
 			{ json.encode(Shop.MenuCoords), Shop.MenuBossEnabled, Shop.label }
 		)
 	end
 
 	if Shop.blipEnabled then
 		updateShopField(
-			"UPDATE mri_Qshops SET blipName = ?, blipCor = ?, blipEnabled = ?, blipSprite = ?, blipscale = ?, blipcoords = ? WHERE label = ?",
+			"UPDATE mri_qshops SET blipName = ?, blipCor = ?, blipEnabled = ?, blipSprite = ?, blipscale = ?, blipcoords = ? WHERE label = ?",
 			{
 				Shop.blipName,
 				Shop.blipCor,
@@ -109,7 +107,7 @@ RegisterNetEvent("mri-Qshops:UpdateShop", function(Shop)
 end)
 
 function GetShops(source, response)
-	local sql = "SELECT * FROM mri_Qshops"
+	local sql = "SELECT * FROM mri_qshops"
 	local result = MySQL.Sync.fetchAll(sql, {})
 	local shops = {}
 	if result and #result > 0 then

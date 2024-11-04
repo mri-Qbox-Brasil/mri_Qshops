@@ -115,7 +115,7 @@ function Bancadashop(name)
         label = name,
         shopCoords = result
         }
-        TriggerServerEvent('mri-Qshops:UpdateShop', shops)
+        TriggerServerEvent('mri_Qshops:UpdateShop', shops)
         lib.showContext('config_menu')
     end
 end
@@ -127,7 +127,7 @@ function Armazem(name)
             label = name,
             armazemCoords = result
         }
-        TriggerServerEvent('mri-Qshops:UpdateShop', shops)
+        TriggerServerEvent('mri_Qshops:UpdateShop', shops)
         print(json.encode(shops),'armazem')
         lib.showContext('config_menu')
     end
@@ -146,7 +146,7 @@ function Bossmenu(name)
             MenuBossEnabled = shopinput[2],
             MenuCoords = result
         }
-        TriggerServerEvent('mri-Qshops:UpdateShop', shops)
+        TriggerServerEvent('mri_Qshops:UpdateShop', shops)
         print(json.encode(shops),'bossmenu')
         lib.showContext('config_menu')
     end
@@ -188,7 +188,7 @@ function MriBlips(name)
             blipcoords = result
         }
         --TriggerServerEvent('mri_qshops:BlipUpdateShop', Shop, name)
-        TriggerServerEvent('mri-Qshops:UpdateShop', shops)
+        TriggerServerEvent('mri_Qshops:UpdateShop', shops)
         print(json.encode(shops),'blip')
 
     end
@@ -239,7 +239,7 @@ function Mrishops(name)
             target = shopinput[3],
             drawmaker = shopinput[4]
         }
-        TriggerServerEvent('mri-qshops:insertShop', shops)
+        TriggerServerEvent('mri_Qshops:insertShop', shops)
     else
         print('erro input')
     end
