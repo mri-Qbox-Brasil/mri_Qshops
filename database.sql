@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `mri_Qshops` (
+CREATE TABLE IF NOT EXISTS `mri_qshops` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `label` text DEFAULT  NULL,
   `jobname` text DEFAULT  NULL,
