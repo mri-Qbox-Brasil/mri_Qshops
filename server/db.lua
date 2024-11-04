@@ -67,35 +67,35 @@ RegisterNetEvent("mri_Qshops:UpdateShop", function(Shop)
 		end
 	end
 
-	if Shop.shopCoords then
+	if Shop.shopcoords then
 		updateShopField(
-			"UPDATE mri_qshops SET shopCoords = ? WHERE label = ?",
-			{ json.encode(Shop.shopCoords), Shop.label }
+			"UPDATE mri_qshops SET shopcoords = ? WHERE label = ?",
+			{ json.encode(Shop.shopcoords), Shop.label }
 		)
 	end
 
-	if Shop.armazemCoords then
+	if Shop.storagecoords then
 		updateShopField(
-			"UPDATE mri_qshops SET armazemCoords = ? WHERE label = ?",
-			{ json.encode(Shop.armazemCoords), Shop.label }
+			"UPDATE mri_qshops SET storagecoords = ? WHERE label = ?",
+			{ json.encode(Shop.storagecoords), Shop.label }
 		)
 	end
 
-	if Shop.MenuCoords then
+	if Shop.menucoords then
 		updateShopField(
-			"UPDATE mri_qshops SET MenuCoords = ?, MenuBossEnabled = ? WHERE label = ?",
-			{ json.encode(Shop.MenuCoords), Shop.MenuBossEnabled, Shop.label }
+			"UPDATE mri_qshops SET menucoords = ?, menuenabled = ? WHERE label = ?",
+			{ json.encode(Shop.menucoords), Shop.menuenabled, Shop.label }
 		)
 	end
 
-	if Shop.blipEnabled then
+	if Shop.blipenabled then
 		updateShopField(
-			"UPDATE mri_qshops SET blipName = ?, blipCor = ?, blipEnabled = ?, blipSprite = ?, blipscale = ?, blipcoords = ? WHERE label = ?",
+			"UPDATE mri_qshops SET blipname = ?, blipcolor = ?, blipenabled = ?, blipsprite = ?, blipscale = ?, blipcoords = ? WHERE label = ?",
 			{
-				Shop.blipName,
-				Shop.blipCor,
-				Shop.blipEnabled,
-				Shop.blipSprite,
+				Shop.blipname,
+				Shop.blipcolor,
+				Shop.blipenabled,
+				Shop.blipsprite,
 				Shop.blipscale,
 				json.encode(Shop.blipcoords),
 				Shop.label,
@@ -112,24 +112,22 @@ function GetShops(source, response)
 	local shops = {}
 	if result and #result > 0 then
 		for k, v in ipairs(result) do
-			print(json.encode(k), "teste")
 			local sho = {
 				id = v.id,
 				label = v.label,
 				jobname = v.jobname,
 				target = v.target,
 				drawmaker = v.drawmaker,
-				blipName = v.blipName,
-				MenuBossEnabled = v.MenuBossEnabled,
+				blipname = v.blipname,
 				blipcoords = json.decode(v.blipcoords),
-				blipSprite = tonumber(v.blipSprite),
-				blipCor = tonumber(v.blipCor),
-				blipEnabled = v.blipEnabled,
+				blipsprite = tonumber(v.blipsprite),
+				blipcolor = tonumber(v.blipcolor),
+				blipenabled = v.blipenabled,
 				blipscale = tonumber(v.blipscale),
-				MenuCoords = json.decode(v.MenuCoords),
-				MenuEnabled = v.MenuEnabled,
-				armazemCoords = json.decode(v.armazemCoords),
-				shopCoords = json.decode(v.shopCoords),
+				menucoords = json.decode(v.menucoords),
+				menuenabled = v.menuenabled,
+				storagecoords = json.decode(v.storagecoords),
+				shopcoords = json.decode(v.shopcoords),
 			}
 			shops[k] = sho
 		end

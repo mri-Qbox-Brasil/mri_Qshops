@@ -41,7 +41,7 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
 				name = v.label,
 				inventory = stashItems,
 				locations = {
-					v.shopCoords,
+					v.shopcoords,
 				},
 			})
 		end
@@ -85,7 +85,7 @@ RegisterNetEvent("mri_qshops:refreshShop", function(shop)
 			name = v.label,
 			inventory = stashItems,
 			locations = {
-				v.shopCoords,
+				v.shopcoords,
 			},
 		})
 	end

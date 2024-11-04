@@ -15,13 +15,13 @@ RegisterNetEvent('mri_Qshops:setProductPrice', function(shop, slot)
 end)
 
 
-local function createBlip(blipcoords, blipName, blipSprite, blipCor, blipscale)
-    local text = blipName
+local function createBlip(blipcoords, blipname, blipsprite, blipcolor, blipscale)
+    local text = blipname
     local blip = AddBlipForCoord(blipcoords.x, blipcoords.y, blipcoords.z)
-    SetBlipSprite(blip, blipSprite)
+    SetBlipSprite(blip, blipsprite)
     SetBlipDisplay(blip, 4)
     SetBlipScale(blip, blipscale)
-    SetBlipColour(blip, blipCor)
+    SetBlipColour(blip, blipcolor)
     SetBlipAsShortRange(blip, true)
     BeginTextCommandSetBlipName("STRING")
     AddTextComponentSubstringPlayerName(text)
@@ -33,9 +33,9 @@ local function mriMenuShops(Shops)
     local textUI, points = nil, {}
     for k, v in pairs(Shops) do
         local job = v.jobname
-        local armazemcoords = v.armazemCoords and vector3(v.armazemCoords.x, v.armazemCoords.y, v.armazemCoords.z) or nil
-        local shopcoords = v.shopCoords and vector3(v.shopCoords.x, v.shopCoords.y, v.shopCoords.z) or nil
-        local menucoords = v.MenuCoords and vector3(v.MenuCoords.x, v.MenuCoords.y, v.MenuCoords.z) or nil
+        local armazemcoords = v.storagecoords and vector3(v.storagecoords.x, v.storagecoords.y, v.storagecoords.z) or nil
+        local shopcoords = v.shopcoords and vector3(v.shopcoords.x, v.shopcoords.y, v.shopcoords.z) or nil
+        local menucoords = v.menucoords and vector3(v.menucoords.x, v.menucoords.y, v.menucoords.z) or nil
         if not points[job] then points[job] = {} end
 
         if armazemcoords then
@@ -46,7 +46,7 @@ local function mriMenuShops(Shops)
             })
         end
     
-        if v.shopCoords then
+        if v.shopcoords then
             points[job].shop = lib.points.new({
                 coords = shopcoords,
                 distance = 4.0,
@@ -54,7 +54,7 @@ local function mriMenuShops(Shops)
             })
         end
 
-        if v.MenuCoords then
+        if v.menucoords then
             points[job].bossMenu = lib.points.new({
                 coords = menucoords,
                 distance = 3.0,
@@ -67,7 +67,7 @@ local function mriMenuShops(Shops)
         if not v.stash then return end
         function v.stash:nearby()
             if not self.isClosest or PlayerData.job.name ~= self.shop then return end
-            if v.blipEnabled then
+            if v.blipenabled then
                 DrawMarker(2, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15,
                     30, 150, 30, 222, false, false, 0, true, false, false, false)
             end

@@ -113,7 +113,7 @@ function Bancadashop(name)
         local result = exports.mri_Qbox:GetRayCoords()
         shops = {
         label = name,
-        shopCoords = result
+        shopcoords = result
         }
         TriggerServerEvent('mri_Qshops:UpdateShop', shops)
         lib.showContext('config_menu')
@@ -125,10 +125,9 @@ function Armazem(name)
         local result = exports.mri_Qbox:GetRayCoords()
         shops = {
             label = name,
-            armazemCoords = result
+            storagecoords = result
         }
         TriggerServerEvent('mri_Qshops:UpdateShop', shops)
-        print(json.encode(shops),'armazem')
         lib.showContext('config_menu')
     end
 end
@@ -143,11 +142,10 @@ function Bossmenu(name)
         local result = exports.mri_Qbox:GetRayCoords()
         shops = {
             label = name,
-            MenuBossEnabled = shopinput[2],
-            MenuCoords = result
+            menuenabled = shopinput[2],
+            menucoords = result
         }
         TriggerServerEvent('mri_Qshops:UpdateShop', shops)
-        print(json.encode(shops),'bossmenu')
         lib.showContext('config_menu')
     end
 end
@@ -180,17 +178,14 @@ function MriBlips(name)
         local result = GetEntityCoords(cache.ped)
         shops = {
             label = name,
-            blipName = shopinput[1],
-            blipCor = shopinput[2],
-            blipEnabled = shopinput[3],
-            blipSprite = shopinput[4],
+            blipname = shopinput[1],
+            blipcolor = shopinput[2],
+            blipenabled = shopinput[3],
+            blipsprite = shopinput[4],
             blipscale = shopinput[5],
             blipcoords = result
         }
-        --TriggerServerEvent('mri_qshops:BlipUpdateShop', Shop, name)
         TriggerServerEvent('mri_Qshops:UpdateShop', shops)
-        print(json.encode(shops),'blip')
-
     end
 end
 
@@ -241,7 +236,7 @@ function Mrishops(name)
         }
         TriggerServerEvent('mri_Qshops:insertShop', shops)
     else
-        print('erro input')
+        return lib.notify({ title = 'Erro', description = 'Criação cancelada.', type = 'error' })
     end
     creatorMenu(name)
 end
