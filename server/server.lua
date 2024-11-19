@@ -25,7 +25,7 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
 			weight = 100,
 		}
 		exports.ox_inventory:RegisterStash(v.jobname, stash.label, stash.slots, stash.weight * 1000)
-		local items = exports.ox_inventory:GetInventoryItems(stash.id, false)
+		local items = exports.ox_inventory:GetInventoryItems(stash.label, false)
 		local stashItems = {}
 		if items and items ~= {} then
 			for _, v2 in pairs(items) do
@@ -34,7 +34,6 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
 						{ name = v2.name, metadata = v2.metadata, count = v2.count, price = (v2.metadata.price or 0) }
 				end
 			end
-
 			exports.ox_inventory:RegisterShop(v.jobname, {
 				name = v.label,
 				inventory = stashItems,
@@ -66,7 +65,6 @@ end)
 
 RegisterNetEvent("mri_qshops:refreshShop", function(shop)
 	local shops = exports.mri_Qshops:GetShops()
-
 	local items = exports.ox_inventory:GetInventoryItems(shop, false)
 	local stashItems = {}
 	for _, v in pairs(items) do
