@@ -1,6 +1,6 @@
 {
     "amount": "Quantidade",
-    "price_value": "Valor do Preço",
+    "price_value": "Digite o valor",
     "sell_price": "Preço de Venda",
     "inventory": "Inventário",
     "success": "Sucesso",

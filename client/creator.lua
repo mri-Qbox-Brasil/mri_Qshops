@@ -16,17 +16,15 @@ function GetBaseGroups(named)
 	local jobs = exports.qbx_core:GetJobs()
 	local groups = {}
 	for k, v in pairs(jobs) do
-		if v.type then
-			local data = {
-				value = k,
-				label = v.label,
-				grades = GetGroupGrades(v),
-			}
-			if named then
-				groups[k] = data
-			else
-				groups[#groups + 1] = data
-			end
+		local data = {
+			value = k,
+			label = v.label,
+			grades = GetGroupGrades(v),
+		}
+		if named then
+			groups[k] = data
+		else
+			groups[#groups + 1] = data
 		end
 	end
 	return groups
