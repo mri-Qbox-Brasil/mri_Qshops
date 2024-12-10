@@ -45,7 +45,8 @@ local function mriMenuShops(Shops)
 			points[job].stash = lib.points.new({
 				coords = armazemcoords,
 				distance = 4.0,
-				shop = job,
+				shop = v.label,
+				job = job,
 				interaction = interaction,
 			})
 		end
@@ -54,7 +55,8 @@ local function mriMenuShops(Shops)
 			points[job].shop = lib.points.new({
 				coords = shopcoords,
 				distance = 4.0,
-				shop = job,
+				shop = v.label,
+				job = job,
 				interaction = interaction,
 			})
 		end
@@ -63,7 +65,8 @@ local function mriMenuShops(Shops)
 			points[job].bossMenu = lib.points.new({
 				coords = menucoords,
 				distance = 3.0,
-				shop = job,
+				shop = v.label,
+				job = job,
 				interaction = interaction,
 			})
 		end
@@ -74,7 +77,7 @@ local function mriMenuShops(Shops)
 			return
 		end
 		function v.stash:nearby()
-			if not self.isClosest or PlayerData.job.name ~= self.shop then
+			if not self.isClosest or PlayerData.job.name ~= self.job then
 				return
 			end
 			if v.blipenabled then

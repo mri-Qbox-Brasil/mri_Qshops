@@ -35,7 +35,7 @@ function Jobname()
 end
 AddEventHandler("onResourceStart", function(resource)
 	if cache.resource == resource then
-		Wait(500)
+		Wait(5000)
 		PlayerData = QBCore.Functions.GetPlayerData()
 		local shops = lib.callback.await("mri_Qshops:server:GetShops")
 		exports.mri_Qshops:mriMenuShops(shops)

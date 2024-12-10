@@ -19,12 +19,14 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
 	end
 	for k, v in pairs(shops) do
 		local stash = {
-			id = v.jobname,
+			id = v.label,
 			label = v.label,
 			slots = 50,
 			weight = 100,
 		}
-		exports.ox_inventory:RegisterStash(v.jobname, stash.label, stash.slots, stash.weight * 1000)
+		exports.ox_inventory:RegisterStash(stash.id, stash.label, stash.slots, stash.weight * 1000)
+		print("Registered Stash: ", stash.id)
+
 		local items = exports.ox_inventory:GetInventoryItems(stash.id, false)
 		local stashItems = {}
 		if items and items ~= {} then
@@ -34,22 +36,31 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
 						{ name = v2.name, metadata = v2.metadata, count = v2.count, price = (v2.metadata.shopData.price or 0) }
 				end
 			end
-			exports.ox_inventory:RegisterShop(v.jobname, {
+			exports.ox_inventory:RegisterShop(stash.id, {
 				name = v.label,
 				inventory = stashItems,
 				locations = {
 					v.shopcoords,
 				},
 			})
+			print("Registerd Shop: ", stash.id)
+
 		end
 	end
 
 	swapHook = exports.ox_inventory:registerHook("swapItems", function(payload)
 		for k, v in pairs(shops) do
-			if payload.fromInventory == v.jobname then
-				TriggerEvent("mri_qshops:refreshShop", v.jobname)
-			elseif payload.toInventory == v.jobname and tonumber(payload.fromInventory) then
-				TriggerClientEvent("mri_Qshops:setProductPrice", payload.fromInventory, v.jobname, payload.toSlot)
+			local stash = {
+				id = v.label,
+				label = v.label,
+				slots = 50,
+				weight = 100,
+			}
+
+			if payload.fromInventory == stash.id then
+				TriggerEvent("mri_qshops:refreshShop", stash.id)
+			elseif payload.toInventory == stash.id and tonumber(payload.fromInventory) then
+				TriggerClientEvent("mri_Qshops:setProductPrice", payload.fromInventory, stash.id, payload.toSlot)
 			end
 		end
 	end, {})
