@@ -9,6 +9,7 @@ version '2.0.1'
 ox_lib 'locale'
 
 shared_scripts {
+    '@qbx_core/modules/playerdata.lua',
     '@ox_lib/init.lua',
     'bridge/framework.lua'
 }

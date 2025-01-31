@@ -1,108 +1,117 @@
 SHOPS_SERVER = {}
 
+local function LoadShops(source, response, up)
+    local shops = GetShops()
+    if up then
+        TriggerClientEvent("mri_Qshops:updatesDBshop", -1, shops)
+    end
+    if response then
+        TriggerClientEvent("ox_lib:notify", source, response)
+    end
+end
+
 RegisterNetEvent("mri_Qshops:insertShop", function(data)
-	local source = source
-	if not IsPlayerAceAllowed(source, "admin") then
-		return TriggerClientEvent("ox_lib:notify", source, {
-			type = "error",
-			description = "Você não tem permissão para usar este comando.",
-		})
-	end
-	local response = {
-		type = "success",
-		description = "Sucesso ao salvar!",
-	}
-	local sql = "INSERT INTO `mri_qshops` (%s) VALUES (%s)"
-	local columns = ""
-	local placeholders = ""
-	local params = {}
+    local source = source
+    if not IsPlayerAceAllowed(source, "admin") then
+        return TriggerClientEvent("ox_lib:notify", source, {
+            type = "error",
+            description = "Você não tem permissão para usar este comando."
+        })
+    end
+    local response = {
+        type = "success",
+        description = "Sucesso ao salvar!"
 
-	for k, v in pairs(data) do
-		if columns == "" then
-			columns = k
-			placeholders = "@" .. k
-		else
-			columns = columns .. ", " .. k
-			placeholders = placeholders .. ", @" .. k
-		end
-		params["@" .. k] = v
-	end
+    }
+    local sql = "INSERT INTO `mri_qshops` (%s) VALUES (%s)"
+    local columns = ""
+    local placeholders = ""
+    local params = {}
 
-	local result = MySQL.Sync.execute(string.format(sql, columns, placeholders), params)
-	if result <= 0 then
-		response.type = "error"
-		response.description = "Erro ao enviar dados."
-	end
-	GetShops(source, response)
+    for k, v in pairs(data) do
+        if columns == "" then
+            columns = k
+            placeholders = "@" .. k
+        else
+            columns = columns .. ", " .. k
+            placeholders = placeholders .. ", @" .. k
+        end
+        params["@" .. k] = v
+    end
+
+    local result = MySQL.Sync.execute(string.format(sql, columns, placeholders), params)
+    if result <= 0 then
+        response.type = "error"
+        response.description = "Erro ao enviar dados."
+        response.reset = false
+    end
+    LoadShops(source, response)
 end)
 
 RegisterNetEvent("mri_Qshops:deleteShop", function(shoplabel)
-	local source = source
-	local sql = "DELETE FROM mri_qshops WHERE label = ?"
-	local response = {
-		type = "success",
-		description = "Shop excluido!",
-	}
-	local result = MySQL.Sync.execute(sql, { shoplabel })
+    local source = source
+    local sql = "DELETE FROM mri_qshops WHERE label = ?"
+    local response = {
+        type = "success",
+        description = "Shop excluido!"
 
-	if result <= 0 then
-		response.type = "error"
-		response.description = "Erro ao excluir."
-	end
-	GetShops(source, response)
+    }
+    local result = MySQL.Sync.execute(sql, {shoplabel})
+
+    if result <= 0 then
+        response.type = "error"
+        response.description = "Erro ao excluir."
+        response.reset = false
+    end
+    LoadShops(source, response, true)
 end)
 
 RegisterNetEvent("mri_Qshops:UpdateShop", function(Shop)
-	local response = {
-		type = "success",
-		description = "Sucesso ao Update!",
-	}
-	local source = source
+    local response = {
+        type = "success",
+        description = "Sucesso ao Update!"
 
-	local function updateShopField(sql, params)
-		local result = MySQL.update.await(sql, params)
-		if result <= 0 then
-			response.type = "error"
-			response.description = "Erro ao excluir."
-		end
-	end
+    }
+    local source = source
 
-	if Shop.shopcoords then
-		updateShopField(
-			"UPDATE mri_qshops SET shopcoords = ? WHERE label = ?",
-			{ json.encode(Shop.shopcoords), Shop.label }
-		)
-	end
+    local function updateShopField(sql, params)
+        local result = MySQL.update.await(sql, params)
+        if result <= 0 then
+            response.type = "error"
+            response.description = "Erro ao excluir."
+        end
+    end
 
-	if Shop.storagecoords then
-		updateShopField(
-			"UPDATE mri_qshops SET storagecoords = ? WHERE label = ?",
-			{ json.encode(Shop.storagecoords), Shop.label }
-		)
-	end
+    if Shop.shopcoords then
+        updateShopField("UPDATE mri_qshops SET shopcoords = ? WHERE label = ?",
+            {json.encode(Shop.shopcoords), Shop.label})
+    end
 
-	if Shop.menucoords then
-		updateShopField(
-			"UPDATE mri_qshops SET menucoords = ? WHERE label = ?",
-			{ json.encode(Shop.menucoords), Shop.label }
-		)
-	end
+    if Shop.storagecoords then
+        updateShopField("UPDATE mri_qshops SET storagecoords = ? WHERE label = ?",
+            {json.encode(Shop.storagecoords), Shop.label})
+    end
 
-	if Shop.blipenabled then
-		updateShopField("UPDATE mri_qshops SET blipdata = ? WHERE label = ?", {
-			json.encode({
-				Shop.blipname,
-				Shop.blipcolor,
-				Shop.blipenabled,
-				Shop.blipsprite,
-				Shop.blipscale,
-				json.encode(Shop.blipcoords),
-				Shop.label,
-			}),
-		})
-	end
+    if Shop.menucoords then
+        updateShopField("UPDATE mri_qshops SET menucoords = ? WHERE label = ?",
+            {json.encode(Shop.menucoords), Shop.label})
+    end
 
-	GetShops(source, response)
+    if Shop.blipenabled then
+        updateShopField("UPDATE mri_qshops SET blipdata = ? WHERE label = ?", {json.encode({
+            blipname = Shop.blipname,
+            blipcolor = Shop.blipcolor,
+            blipenabled = Shop.blipenabled,
+            blipsprite = Shop.blipsprite,
+            blipscale = Shop.blipscale,
+            blipcoords = Shop.blipcoords
+        }), Shop.label})
+    end
+    LoadShops(source, response)
+end)
+
+RegisterNetEvent("mri_Qshops:Saveshop", function(source, response)
+    LoadShops(source, response, true)
 end)
 
 function GetShops(source, response)
@@ -125,60 +134,58 @@ function GetShops(source, response)
 		end
 	end
 	SHOPS_SERVER = shops
-	TriggerClientEvent("mri_Qshops:updatesDBshop", -1, SHOPS_SERVER)
-	if response then
-		TriggerClientEvent("ox_lib:notify", source, response)
-	end
 	return SHOPS_SERVER
 end
 exports("GetShops", GetShops)
+lib.callback.register("mri_Qshops:server:LoadShops", function(source)
+    local response = {}
+    return LoadShops(source, response, true)
+end)
 
 local function splitStr(inputstr, sep)
-	if sep == nil then
-		sep = "%s"
-	end
-	local t = {}
-	for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
-		str = string.gsub(str, "^%s*(.-)%s*$", "%1")
-		if not (str == nil or str == "") then
-			table.insert(t, str)
-		end
-	end
-	return t
+    if sep == nil then
+        sep = "%s"
+    end
+    local t = {}
+    for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
+        str = string.gsub(str, "^%s*(.-)%s*$", "%1")
+        if not (str == nil or str == "") then
+            table.insert(t, str)
+        end
+    end
+    return t
 end
 
 local function executeQueries(queries, callback)
-	local index = 1
-	local function executeNextQuery()
-		if index > #queries then
-			if callback then
-				callback()
-			end
-			return
-		end
-		MySQL.Async.execute(queries[index], {}, function()
-			print("Tabela verificada/criada: " .. index)
-			index = index + 1
-			executeNextQuery()
-		end)
-	end
-	executeNextQuery()
+    local index = 1
+    local function executeNextQuery()
+        if index > #queries then
+            if callback then
+                callback()
+            end
+            return
+        end
+        MySQL.Async.execute(queries[index], {}, function()
+            print("Tabela verificada/criada: " .. index)
+            index = index + 1
+            executeNextQuery()
+        end)
+    end
+    executeNextQuery()
 end
 
 local function createTables()
-	local filePath = "database.sql"
-	local queries = splitStr(LoadResourceFile(GetCurrentResourceName(), filePath), ";")
+    local filePath = "database.sql"
+    local queries = splitStr(LoadResourceFile(GetCurrentResourceName(), filePath), ";")
 
-	executeQueries(queries, function()
-		print("Todas as tabelas foram verificadas/criadas.")
-		GetShops()
-		TriggerEvent("mri_Qshops:server:createHooks")
-	end)
+    executeQueries(queries, function()
+        print("Todas as tabelas foram verificadas/criadas.")
+    end)
 end
 
 AddEventHandler("onResourceStart", function(resourceName)
-	if GetCurrentResourceName() == resourceName then
-		print("Recurso " .. resourceName .. " iniciado. Verificando/criando tabelas...")
-		createTables()
-	end
+    if GetCurrentResourceName() == resourceName then
+        print("Recurso " .. resourceName .. " iniciado. Verificando/criando tabelas...")
+        createTables()
+    end
 end)
