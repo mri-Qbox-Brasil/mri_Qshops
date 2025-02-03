@@ -52,12 +52,12 @@ end
 
 local removeTarget = nil or {}
 local function clearPointsTarget()
-    local UseTarget = true
-    if pointsTarget then
+    if pointsTarget ~= {} then
         for k, v in pairs(pointsTarget) do
             exports.ox_target:removeZone(k)
         end
     end
+    pointsTarget = {}
     Citizen.Wait(0)
 end
 
@@ -91,7 +91,7 @@ local function addTarget(coords, label, name, type, job)
                     end
                     OpenBossMenu(Jobname())
                 elseif type == "shop" then
-                    exports.ox_inventory:openInventory(type, {
+                    exports.ox_inventory:openInventory("shop", {
                         type = label,
                         id = 1
                     })
@@ -99,7 +99,7 @@ local function addTarget(coords, label, name, type, job)
                     if Jobname() ~= job then
                         return
                     end
-                    exports.ox_inventory:openInventory(type, label)
+                    exports.ox_inventory:openInventory("stash", label)
                 end
             end
         }
@@ -141,13 +141,6 @@ end
 
 function mriMenuShops(Shops)
     local textUI = {}
-    local armazem = nil or {}
-    local menu = nil or {}
-    local shop = nil or {}
-
-    if pointsTarget then
-        clearPointsTarget()
-    end
 
     for k, v in pairs(Shops) do
         if v.interaction == "drawmarker" and v.label then
@@ -300,6 +293,7 @@ RegisterNetEvent("mri_Qshops:updatesDBshop", function(Shops)
         return
     end
     removePoints()
+    clearPointsTarget()
     mriMenuShops(Shops)
     MenuTarget(Shops)
     updateShopsBlips(Shops)

@@ -1,7 +1,4 @@
 mri_Qcolors = GlobalState.UIColors or {}
-local shops = {}
-local key = json.decode(GetResourceKvpString('mri_qshops_key')) or nil
-local newShop = {} or nil
 function GetGroupGrades(group)
     local grades = {}
     for k, v in pairs(group.grades) do
@@ -31,18 +28,13 @@ function GetBaseGroups(named)
     return groups
 end
 
-
 local function creationMenu(args)
-    local name = ''
-    if args and args.shopkey and args.shopName then
-        key = args.shopkey
-    end
+    local result = promise.new()
+    local key =  lib.callback.await("mri_Qshops:server:GetMaxShopId", false) or 0
+    result:resolve(key)
+    Citizen.Await(result)
+    
     local shop = {}
-    if key then
-       key = key + 1
-    else
-        table.clone (newShop , shop)
-    end
     local shopinput = lib.inputDialog("Criação de Negócios", {{
         type = "input",
         label = "Nome",
@@ -72,9 +64,8 @@ local function creationMenu(args)
     }})
 
     if shopinput ~= nil then
-        name = shopinput[1]
-        if not key then
-            key = 1
+        if key >= 0 then
+            key = key + 1
         end
         local data = {
             label = string.format("%s%s", shopinput[1], key),
@@ -89,12 +80,11 @@ local function creationMenu(args)
             description = "Criação cancelada.",
             type = "error"
         })
-    end 
-    args.callback(name, key)   
-    SetResourceKvp('mri_qshops_key', json.encode(key))
+    end
+    args.callback(key)
 end
 
-local function editMenu(name)
+function editMenu(name)
     lib.registerContext({
         id = "config_menu",
         menu = "menu_creator",
@@ -171,7 +161,7 @@ function saveShop()
         type = "success",
         description = "Sucesso ao Salvar!"
     }
-    TriggerServerEvent("mri_Qshops:Saveshop", cache.ped, response)
+    TriggerServerEvent("mri_Qshops:Saveshop", cache.playerId)
 end
 
 function editBlips(name)
@@ -214,20 +204,9 @@ function editBlips(name)
     mainMenu(name)
 end
 
-function deleteShop(name)
-    local result = lib.alertDialog({
-        header = "Excluir Shop",
-        content = "Você tem certeza que deseja excluir " .. name .. "?",
-        centered = true,
-        cancel = true
-    })
-    if result == "confirm" then
-        TriggerServerEvent("mri_Qshops:deleteShop", name)
-    end
-    mainMenu(name)
-end
-
 function mainMenu(name, key)
+    local result = promise.new()
+    local Shops = lib.callback.await("mri_Qshops:server:GetShops", false)
     local ctx = {
         id = "menu_creator",
         menu = "menu_gerencial",
@@ -239,18 +218,19 @@ function mainMenu(name, key)
             iconAnimation = "fade",
             onSelect = creationMenu,
             args = {
-                shopName = name,
-                shopkey = key,
+                shopKey = key,
                 callback = mainMenu
 
             }
-        
+
         }, {
             progress = true
         }}
     }
 
-    local Shops = lib.callback.await("mri_Qshops:server:GetShops", false)
+    result:resolve(Shops)
+    Citizen.Await(result)
+
     if #Shops == 0 then
         table.insert(ctx.options, {
             title = "Lista vazia",
@@ -264,14 +244,37 @@ function mainMenu(name, key)
             table.insert(ctx.options, {
                 title = v.label,
                 icon = "edit",
-                onSelect = function() 
-                editMenu(v.label)
-                end,
+                onSelect = function()
+                    editMenu(v.label)
+                end
             })
         end
+        ctx.options[#ctx.options + 1] = {
+            title = "Salvar",
+            description = "Salvar Alterações!",
+            icon = "floppy-disk",
+            iconAnimation = "fade",
+            onSelect = function()
+                saveShop()
+            end
+        }
     end
+
     lib.registerContext(ctx)
     lib.showContext(ctx.id)
+end
+
+function deleteShop(name)
+    local result = lib.alertDialog({
+        header = "Excluir Shop",
+        content = "Você tem certeza que deseja excluir " .. name .. "?",
+        centered = true,
+        cancel = true
+    })
+    if result == "confirm" then
+        TriggerServerEvent("mri_Qshops:deleteShop", name)
+    end
+    mainMenu(name)
 end
 
 if GetResourceState("mri_Qbox") == "started" then

@@ -31,6 +31,5 @@ AddEventHandler('onResourceStart', function(resource)
         Wait(500)
         PlayerData = ESX.GetPlayerData()
         lib.callback.await("mri_Qshops:server:LoadShops", false)
-        TriggerServerEvent("mri_Qshops:server:createHooks")
     end
 end)

@@ -39,7 +39,6 @@ AddEventHandler("onResourceStart", function(resource)
     if cache.resource == resource then
         PlayerData = QBCore.Functions.GetPlayerData()
         lib.callback.await("mri_Qshops:server:LoadShops", false)
-        TriggerServerEvent("mri_Qshops:server:createHooks")
     end
 end)
 

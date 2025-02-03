@@ -1,15 +1,5 @@
 SHOPS_SERVER = {}
 
-local function LoadShops(source, response, up)
-    local shops = GetShops()
-    if up then
-        TriggerClientEvent("mri_Qshops:updatesDBshop", -1, shops)
-    end
-    if response then
-        TriggerClientEvent("ox_lib:notify", source, response)
-    end
-end
-
 RegisterNetEvent("mri_Qshops:insertShop", function(data)
     local source = source
     if not IsPlayerAceAllowed(source, "admin") then
@@ -110,7 +100,12 @@ RegisterNetEvent("mri_Qshops:UpdateShop", function(Shop)
     LoadShops(source, response)
 end)
 
-RegisterNetEvent("mri_Qshops:Saveshop", function(source, response)
+RegisterNetEvent("mri_Qshops:Saveshop", function(source)
+    local response = {
+        type = "success",
+        description = "Sucesso ao Salvar!"
+    }
+    TriggerEvent("mri_Qshops:server:createHooks")
     LoadShops(source, response, true)
 end)
 
@@ -137,6 +132,17 @@ function GetShops(source, response)
 	return SHOPS_SERVER
 end
 exports("GetShops", GetShops)
+
+function LoadShops(source, response, up)
+    local shops = GetShops()
+    if up then
+        TriggerClientEvent("mri_Qshops:updatesDBshop", -1, shops)
+    end
+    if response then
+        TriggerClientEvent("ox_lib:notify", source, response)
+    end
+end
+
 lib.callback.register("mri_Qshops:server:LoadShops", function(source)
     local response = {}
     return LoadShops(source, response, true)
@@ -155,6 +161,16 @@ local function splitStr(inputstr, sep)
     end
     return t
 end
+
+function GetMaxShopId()
+    local sql = "SELECT MAX(id) as maxId FROM mri_qshops"
+    local result = MySQL.Sync.fetchAll(sql, {})
+    return result[1] and result[1].maxId or 0
+end
+
+lib.callback.register("mri_Qshops:server:GetMaxShopId", function(source)
+    return GetMaxShopId()
+end)
 
 local function executeQueries(queries, callback)
     local index = 1
@@ -180,6 +196,7 @@ local function createTables()
 
     executeQueries(queries, function()
         print("Todas as tabelas foram verificadas/criadas.")
+        TriggerEvent("mri_Qshops:server:createHooks")
     end)
 end
 
