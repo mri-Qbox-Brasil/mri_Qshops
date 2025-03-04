@@ -68,11 +68,24 @@ local function creationMenu(args)
             key = key + 1
         end
         local data = {
-            label = string.format("%s%s", shopinput[1], key),
+            label = shopinput[1],
             jobname = shopinput[2],
             interaction = shopinput[3]
         }
-        TriggerServerEvent("mri_Qshops:insertShop", data)
+        local success = lib.callback.await("mri_Qshops:server:insertShop", false, data)
+        if success then
+            lib.notify({
+                title = "Sucesso",
+                description = "Negócio criado com sucesso!",
+                type = "success"
+            })
+        else
+            lib.notify({
+                title = "Erro",
+                description = "Já existe um nome de negócio assim!",
+                type = "error"
+            })
+        end
     else
         lib.showContext("menu_creator")
         return lib.notify({
@@ -160,6 +173,14 @@ function editMenu(name)
                 changeShopLabel(name)
             end
         }, {
+            title = "Alterar Job",
+            description = "Modificar o job que controla a loja.",
+            icon = "briefcase",
+            iconAnimation = "fade",
+            onSelect = function()
+                changeShopJob(name)
+            end
+        }, {
             title = "Loja",
             description = "Defina a localização da loja.",
             icon = "cart-shopping",
@@ -219,6 +240,48 @@ function editMenu(name)
         }}
     })
     lib.showContext("config_menu")
+end
+
+function changeShopJob(name)
+    local jobOptions = GetBaseGroups(false)
+
+    local input = lib.inputDialog("Alterar Job da Loja", {{
+        type = "select",
+        label = "Novo Job",
+        description = "Selecione o novo job para gerenciar a loja.",
+        options = jobOptions,
+        required = true,
+        searchable = true
+    }})
+
+    if input ~= nil and input[1] ~= "" then
+        local newJob = input[1]
+
+        local success = lib.callback.await("mri_Qshops:server:updateShopJob", false, {
+            label = name,
+            newJob = newJob
+        })
+
+        if success then
+            lib.notify({
+                title = "Job Alterado!",
+                description = "O novo job da loja é " .. newJob,
+                type = "success"
+            })
+        else
+            lib.notify({
+                title = "Erro",
+                description = response and response.description or "Não foi possível alterar o job.",
+                type = "error"
+            })
+        end
+    else
+        lib.notify({
+            title = "Erro",
+            description = "Edição cancelada ou job inválido.",
+            type = "error"
+        })
+    end
 end
 
 function changeShopLabel(name)

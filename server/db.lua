@@ -1,6 +1,6 @@
 SHOPS_SERVER = {}
 
-RegisterNetEvent("mri_Qshops:insertShop", function(data)
+lib.callback.register("mri_Qshops:server:insertShop", function(source, data)
     local source = source
     if not IsPlayerAceAllowed(source, "admin") then
         return TriggerClientEvent("ox_lib:notify", source, {
@@ -8,6 +8,14 @@ RegisterNetEvent("mri_Qshops:insertShop", function(data)
             description = "Você não tem permissão para usar este comando."
         })
     end
+
+    if data.label then
+        local duplicate = MySQL.single.await("SELECT label FROM mri_qshops WHERE label = ?", {data.label})
+        if duplicate then
+            return
+        end
+    end
+
     local response = {
         type = "success",
         description = "Sucesso ao salvar!"
@@ -36,6 +44,7 @@ RegisterNetEvent("mri_Qshops:insertShop", function(data)
         response.reset = false
     end
     LoadShops(source, response)
+    return true
 end)
 
 RegisterNetEvent("mri_Qshops:deleteShop", function(shoplabel)
@@ -78,6 +87,22 @@ lib.callback.register("mri_Qshops:server:updateShopLabel", function(source, Shop
     return true
 end)
 
+lib.callback.register("mri_Qshops:server:updateShopJob", function(source, Shop)
+    local source = source
+
+    local existingJob = MySQL.scalar.await("SELECT jobname FROM mri_qshops WHERE label = ?", {Shop.label})
+
+    if existingJob == Shop.newJob then
+        return
+    end
+
+    local updated = MySQL.update.await("UPDATE mri_qshops SET jobname = ? WHERE label = ?", {Shop.newJob, Shop.label})
+    if updated <= 0 then
+        return
+    end
+
+    return true
+end)
 
 RegisterNetEvent("mri_Qshops:UpdateShop", function(Shop)
     local response = {
