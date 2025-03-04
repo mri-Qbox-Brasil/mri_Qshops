@@ -11,6 +11,7 @@ ox_lib 'locale'
 shared_scripts {
     '@qbx_core/modules/playerdata.lua',
     '@ox_lib/init.lua',
+    'config.lua',
     'bridge/framework.lua'
 }
 

@@ -67,11 +67,11 @@ local function addTarget(coords, label, name, type, job)
         return
     end
     if type == "stash" then
-        icon = "box"
+        icon = "fa-solid fa-box"
     elseif type == "shop" then
-        icon = "shop"
+        icon = "fa-solid fa-cart-shopping"
     elseif type == "bossMenu" then
-        icon = "crown"
+        icon = "fa-solid fa-crown"
     end
     pointsTarget[label] = nil or {}
     pointsTarget[label] = exports.ox_target:addSphereZone({
@@ -96,9 +96,13 @@ local function addTarget(coords, label, name, type, job)
                         id = 1
                     })
                 elseif type == "stash" then
+                    debug("Tentou abrir stash: ".. job .. " " .. label)
                     if Jobname() ~= job then
                         return
                     end
+
+                    local Jobname = Jobname()
+                    debug("Jobname: " .. Jobname .. " job: " .. job)
                     exports.ox_inventory:openInventory("stash", label)
                 end
             end

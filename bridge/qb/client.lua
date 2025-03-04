@@ -32,6 +32,7 @@ function OpenBossMenu()
 end
 
 function Jobname()
+    debug("Jobname: "..  QBX.PlayerData.job.name)
     return QBX.PlayerData.job.name
 end
 

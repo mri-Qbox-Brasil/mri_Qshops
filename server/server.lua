@@ -3,10 +3,6 @@ if not IsESX() and not IsQBCore() then
     error("Framework not detected")
 end
 
-lib.callback.register("mri_Qshops:server:registerStash", function(source, id, label, slots, weight)
-    return exports.ox_inventory:RegisterStash(id, label, slots, weight)
-end)
-
 lib.callback.register("mri_Qshops:server:GetShops", function()
     Citizen.Wait(0)
     return exports.mri_Qshops:GetShops()
@@ -32,7 +28,7 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
     if not swapHook or not buyHook then
         swapHook, buyHook = {}, {}
     end
-
+    local job = ""
     local shops = exports.mri_Qshops:GetShops()
 
     while GetResourceState("ox_inventory") ~= "started" do
@@ -46,7 +42,7 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
             weight = 100
         }
         exports.ox_inventory:RegisterStash(stash.id, stash.label, stash.slots, stash.weight * 1000)
-        print("Registered Stash: ", stash.id)
+		debug("RegisterStash: " .. stash.id .. " " .. stash.label .. " " .. stash.slots .. " " .. stash.weight)
 
         local items = exports.ox_inventory:GetInventoryItems(stash.id, false)
         local stashItems = {}
@@ -66,7 +62,7 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
                 inventory = stashItems,
                 locations = {v.shopcoords}
             })
-            print("Registerd Shop: ", stash.id)
+            debug("Registerd Shop: ".. stash.id)
 
         end
     end
@@ -79,7 +75,7 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
                 slots = 50,
                 weight = 100
             }
-
+            job = v.jobname
             if payload.fromInventory == stash.id then
                 TriggerEvent("mri_qshops:refreshShop", stash.id)
             elseif payload.toInventory == stash.id and tonumber(payload.fromInventory) then
@@ -91,9 +87,8 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
     buyHook[#buyHook + 1] = exports.ox_inventory:registerHook("buyItem", function(payload)
         local metadata = payload.metadata
         if metadata.shopData then
-            print(json.encode(metadata.shopData.price), 'metadata.shopData.price')
             exports.ox_inventory:RemoveItem(metadata.shopData.shop, payload.itemName, payload.count)
-            AddMoney(metadata.shopData.shop, metadata.shopData.price, string.format("Venda de x%s %s por R$%s",
+            AddMoney(job, metadata.shopData.price, string.format("Venda de x%s %s por R$%s",
                 payload.count, payload.itemName, metadata.shopData.price))
         end
     end, {})
@@ -118,6 +113,7 @@ RegisterNetEvent("mri_qshops:refreshShop", function(shop)
         end
     end
     for k, v in pairs(shops) do
+		debug("RegisterShop: ", v.label)
         exports.ox_inventory:RegisterShop(shop, {
             name = v.label,
             inventory = stashItems,

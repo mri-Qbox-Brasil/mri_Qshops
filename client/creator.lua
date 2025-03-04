@@ -84,6 +84,67 @@ local function creationMenu(args)
     args.callback(key)
 end
 
+local Shops = {}
+
+function mainMenu(name, key)
+    local result = promise.new()
+    Shops = lib.callback.await("mri_Qshops:server:GetShops", false) or {}
+
+    local ctx = {
+        id = "menu_creator",
+        menu = "menu_gerencial",
+        title = "Negócios",
+        description = "Gerenciar Negócios",
+        options = {{
+            title = "Criar um novo Negócio",
+            icon = "plus",
+            iconAnimation = "fade",
+            onSelect = creationMenu,
+            args = {
+                shopKey = key,
+                callback = mainMenu
+            }
+        }, {
+            progress = true
+        }}
+    }
+
+    result:resolve(Shops)
+    Citizen.Await(result)
+
+    if #Shops == 0 then
+        table.insert(ctx.options, {
+            title = "Lista vazia",
+            icon = "list",
+            description = "Está faltando criatividade por aqui...",
+            iconAnimation = "fade",
+            disabled = true
+        })
+    else
+        for k, v in pairs(Shops) do
+            table.insert(ctx.options, {
+                title = v.label,
+                icon = "edit",
+                onSelect = function()
+                    editMenu(v.label)
+                end
+            })
+        end
+        ctx.options[#ctx.options + 1] = {
+            title = "Salvar",
+            description = "Salvar Alterações!",
+            icon = "floppy-disk",
+            iconAnimation = "fade",
+            onSelect = function()
+                saveShop()
+            end
+        }
+    end
+
+    lib.registerContext(ctx)
+    lib.showContext(ctx.id)
+end
+
 function editMenu(name)
     lib.registerContext({
         id = "config_menu",
@@ -123,6 +184,14 @@ function editMenu(name)
                 editBlips(name)
             end
         }, {
+            title = "Teleportar",
+            description = "Ir para a localização da loja, se já estiver definida.",
+            icon = "location-arrow",
+            iconAnimation = "fade",
+            onSelect = function()
+                teleportToShop(name)
+            end
+        }, {
             title = "Salvar",
             description = "Salvar Alterações!",
             icon = "floppy-disk",
@@ -143,6 +212,27 @@ function editMenu(name)
     })
     lib.showContext("config_menu")
 end
+
+function teleportToShop(name)
+    for _, shop in pairs(Shops) do
+        if shop.label == name and shop.shopcoords then
+            SetEntityCoords(cache.ped, shop.shopcoords.x, shop.shopcoords.y, shop.shopcoords.z)
+            lib.notify({
+                title = "Teleportado!",
+                description = "Você foi teleportado para a loja.",
+                type = "success"
+            })
+            return
+        end
+    end
+
+    lib.notify({
+        title = "Erro",
+        description = "Nenhuma coordenada definida para esta loja.",
+        type = "error"
+    })
+end
+
 
 function updateCoords(name, coordType)
     if name then
@@ -202,66 +292,6 @@ function editBlips(name)
         TriggerServerEvent("mri_Qshops:UpdateShop", data)
     end
     mainMenu(name)
-end
-
-function mainMenu(name, key)
-    local result = promise.new()
-    local Shops = lib.callback.await("mri_Qshops:server:GetShops", false)
-    local ctx = {
-        id = "menu_creator",
-        menu = "menu_gerencial",
-        title = "Negócios",
-        description = "Gerenciar Negócios",
-        options = {{
-            title = "Criar um novo Negócio",
-            icon = "plus",
-            iconAnimation = "fade",
-            onSelect = creationMenu,
-            args = {
-                shopKey = key,
-                callback = mainMenu
-
-            }
-
-        }, {
-            progress = true
-        }}
-    }
-
-    result:resolve(Shops)
-    Citizen.Await(result)
-
-    if #Shops == 0 then
-        table.insert(ctx.options, {
-            title = "Lista vazia",
-            icon = "list",
-            description = "Está faltando criatividade por aqui...",
-            iconAnimation = "fade",
-            disabled = true
-        })
-    else
-        for k, v in pairs(Shops) do
-            table.insert(ctx.options, {
-                title = v.label,
-                icon = "edit",
-                onSelect = function()
-                    editMenu(v.label)
-                end
-            })
-        end
-        ctx.options[#ctx.options + 1] = {
-            title = "Salvar",
-            description = "Salvar Alterações!",
-            icon = "floppy-disk",
-            iconAnimation = "fade",
-            onSelect = function()
-                saveShop()
-            end
-        }
-    end
-
-    lib.registerContext(ctx)
-    lib.showContext(ctx.id)
 end
 
 function deleteShop(name)
