@@ -186,6 +186,13 @@ function editMenu(name)
             icon = "cart-shopping",
             iconAnimation = "fade",
             onSelect = function()
+                local result = lib.alertDialog({
+                    header = "Confirmação",
+                    content = "Você tem certeza que deseja redefinir a localização?",
+                    centered = true,
+                    cancel = true
+                })
+                if result ~= "confirm" then return lib.showContext("config_menu") end
                 updateCoords(name, "shopcoords")
             end
         }, {
@@ -194,19 +201,33 @@ function editMenu(name)
             icon = "location-dot",
             iconAnimation = "fade",
             onSelect = function()
+                local result = lib.alertDialog({
+                    header = "Confirmação",
+                    content = "Você tem certeza que deseja redefinir a localização?",
+                    centered = true,
+                    cancel = true
+                })
+                if result ~= "confirm" then return lib.showContext("config_menu") end
                 updateCoords(name, "storagecoords")
             end
         }, {
             title = "Bossmenu",
-            description = "Defina a localização do bossmenu.",
+            description = "Defina a localização. (Opcional)",
             icon = "computer",
             iconAnimation = "fade",
             onSelect = function()
+                local result = lib.alertDialog({
+                    header = "Confirmação",
+                    content = "Você tem certeza que deseja redefinir a localização?",
+                    centered = true,
+                    cancel = true
+                })
+                if result ~= "confirm" then return lib.showContext("config_menu") end
                 updateCoords(name, "menucoords")
             end
         }, {
             title = "Blip",
-            description = "Defina a localização do blip (aparece no MAPA)",
+            description = "Defina a localização do blip do mapa. (Opcional)",
             icon = "boxes-packing",
             iconAnimation = "fade",
             onSelect = function()
