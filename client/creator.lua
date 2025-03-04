@@ -152,6 +152,14 @@ function editMenu(name)
         title = "Editar",
         description = name,
         options = {{
+            title = "Alterar Nome",
+            description = "Modificar o nome do negócio.",
+            icon = "pen",
+            iconAnimation = "fade",
+            onSelect = function()
+                changeShopLabel(name)
+            end
+        }, {
             title = "Loja",
             description = "Defina a localização da loja.",
             icon = "cart-shopping",
@@ -211,6 +219,50 @@ function editMenu(name)
         }}
     })
     lib.showContext("config_menu")
+end
+
+function changeShopLabel(name)
+    local input = lib.inputDialog("Alterar Nome do Negócio", {{
+        type = "input",
+        label = "Novo Nome",
+        description = "Digite um novo nome para a loja.",
+        required = true,
+        min = 1,
+        max = 32,
+        default = name
+    }})
+
+    if input ~= nil and input[1] ~= "" then
+        local newLabel = input[1]
+
+        -- Verifica no servidor se o nome já existe
+        local success = lib.callback.await("mri_Qshops:server:updateShopLabel", false, {
+            label = name,
+            newLabel = newLabel
+        })
+
+        if success then
+            lib.notify({
+                title = "Nome Alterado!",
+                description = "O nome do negócio foi atualizado para " .. newLabel,
+                type = "success"
+            })
+
+            editMenu(newLabel) -- Reabrir menu com o novo nome
+        else
+            lib.notify({
+                title = "Erro",
+                description = response and response.description or "Não foi possível alterar o nome.",
+                type = "error"
+            })
+        end
+    else
+        lib.notify({
+            title = "Erro",
+            description = "Nome inválido ou edição cancelada.",
+            type = "error"
+        })
+    end
 end
 
 function teleportToShop(name)

@@ -16,10 +16,6 @@ local function RemoveHooks()
     for i = 1, #swapHook do
         exports.ox_inventory:removeHooks(swapHook[i])
     end
-
-    for i = 1, #buyHook do
-        exports.ox_inventory:removeHooks(buyHook[i])
-    end
 end
 
 RegisterNetEvent("mri_Qshops:server:createHooks", function()

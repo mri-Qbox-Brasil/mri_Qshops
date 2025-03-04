@@ -56,6 +56,29 @@ RegisterNetEvent("mri_Qshops:deleteShop", function(shoplabel)
     LoadShops(source, response, true)
 end)
 
+lib.callback.register("mri_Qshops:server:updateShopLabel", function(source, Shop)
+    local response = {
+        type = "success",
+        description = "Sucesso ao Update!"
+
+    }
+    local source = source
+    if Shop.newLabel then
+        local duplicate = MySQL.single.await("SELECT label FROM mri_qshops WHERE label = ?", {Shop.newLabel})
+        if duplicate then
+            return
+        end
+
+        local updated = MySQL.update.await("UPDATE mri_qshops SET label = ? WHERE label = ?", {Shop.newLabel, Shop.label})
+        if updated <= 0 then
+            return
+        end
+    end
+    LoadShops(source, response)
+    return true
+end)
+
+
 RegisterNetEvent("mri_Qshops:UpdateShop", function(Shop)
     local response = {
         type = "success",
