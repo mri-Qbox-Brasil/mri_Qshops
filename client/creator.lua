@@ -159,6 +159,15 @@ function mainMenu(name, key)
 end
 
 function editMenu(name)
+    local coordsExist
+
+    for _, shop in pairs(Shops) do
+        if shop.label == name and shop.shopcoords then
+            coordsExist = true
+            break
+        end
+    end
+
     lib.registerContext({
         id = "config_menu",
         menu = "menu_creator",
@@ -238,6 +247,7 @@ function editMenu(name)
             description = "Ir para a localização da loja, se já estiver definida.",
             icon = "location-arrow",
             iconAnimation = "fade",
+            disabled = not coordsExist,
             onSelect = function()
                 teleportToShop(name)
             end
