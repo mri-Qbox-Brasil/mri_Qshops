@@ -257,33 +257,35 @@ function mriMenuShops(Shops)
                 end
             end
 
-            function v.bossMenu:nearby()
-                if not self.isClosest then
-                    return
-                end
-                if IsBoss() then
-                    if self.currentDistance < self.distance then
-                        if v.interaction == "drawmarker" then
-                            DrawMarker(2, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                0.3, 0.2, 0.15, 30, 150, 30, 222, false, false, 0, true, false, false, false)
-                        end
-                        if not textUI then
-                            lib.showTextUI("[E] - Bossmenu", {
-                                icon = "crown"
-                            })
-                            textUI = true
-                        end
-                        if IsControlJustReleased(0, 38) then
-                            OpenBossMenu(Jobname())
+            if v.bossMenu then
+                function v.bossMenu:nearby()
+                    if not self.isClosest then
+                        return
+                    end
+                    if IsBoss() then
+                        if self.currentDistance < self.distance then
+                            if v.interaction == "drawmarker" then
+                                DrawMarker(2, self.coords.x, self.coords.y, self.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                    0.3, 0.2, 0.15, 30, 150, 30, 222, false, false, 0, true, false, false, false)
+                            end
+                            if not textUI then
+                                lib.showTextUI("[E] - Bossmenu", {
+                                    icon = "crown"
+                                })
+                                textUI = true
+                            end
+                            if IsControlJustReleased(0, 38) then
+                                OpenBossMenu(Jobname())
+                            end
                         end
                     end
                 end
-            end
 
-            function v.bossMenu:onExit()
-                if textUI then
-                    lib.hideTextUI()
-                    textUI = nil
+                function v.bossMenu:onExit()
+                    if textUI then
+                        lib.hideTextUI()
+                        textUI = nil
+                    end
                 end
             end
         end

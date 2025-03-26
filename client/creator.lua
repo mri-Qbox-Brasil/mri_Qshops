@@ -299,12 +299,14 @@ function changeShopJob(name)
                 description = "O novo job da loja é " .. newJob,
                 type = "success"
             })
+            editMenu(name)
         else
             lib.notify({
                 title = "Erro",
                 description = response and response.description or "Não foi possível alterar o job.",
                 type = "error"
             })
+            lib.showContext("config_menu")
         end
     else
         lib.notify({
@@ -312,6 +314,7 @@ function changeShopJob(name)
             description = "Edição cancelada ou job inválido.",
             type = "error"
         })
+        lib.showContext("config_menu")
     end
 end
 
@@ -349,6 +352,7 @@ function changeShopLabel(name)
                 description = response and response.description or "Não foi possível alterar o nome.",
                 type = "error"
             })
+            lib.showContext("config_menu")
         end
     else
         lib.notify({
@@ -356,6 +360,7 @@ function changeShopLabel(name)
             description = "Nome inválido ou edição cancelada.",
             type = "error"
         })
+        lib.showContext("config_menu")
     end
 end
 
@@ -368,7 +373,8 @@ function teleportToShop(name)
                 description = "Você foi teleportado para a loja.",
                 type = "success"
             })
-            return
+            lib.showContext("config_menu")
+            return 
         end
     end
 
@@ -388,7 +394,7 @@ function updateCoords(name, coordType)
             [coordType] = result
         }
         TriggerServerEvent("mri_Qshops:UpdateShop", data)
-        lib.showContext("config_menu")
+        editMenu(name)
     end
 end
 
