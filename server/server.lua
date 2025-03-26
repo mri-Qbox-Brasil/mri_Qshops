@@ -49,7 +49,7 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
                         name = v2.name,
                         metadata = v2.metadata,
                         count = v2.count,
-                        price = (v2.metadata.shopData.price or 0)
+                        price = (v2.metadata.shopData and v2.metadata.shopData.price or 0)
                     }
                 end
             end
