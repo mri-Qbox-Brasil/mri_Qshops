@@ -75,7 +75,7 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
             if payload.fromInventory == stash.id then
                 TriggerEvent("mri_qshops:refreshShop", stash.id)
             elseif payload.toInventory == stash.id and tonumber(payload.fromInventory) then
-                TriggerClientEvent("mri_Qshops:setProductPrice", payload.fromInventory, stash.id, payload.toSlot)
+                TriggerClientEvent("mri_Qshops:setProductPrice", payload.fromInventory, stash.id, payload.toSlot, job)
             end
         end
     end, {})
@@ -84,7 +84,9 @@ RegisterNetEvent("mri_Qshops:server:createHooks", function()
         local metadata = payload.metadata
         if metadata.shopData then
             exports.ox_inventory:RemoveItem(metadata.shopData.shop, payload.itemName, payload.count)
-            AddMoney(job, metadata.shopData.price, string.format("Venda de x%s %s por R$%s",
+            if not metadata.shopData and metadata.shopData.job then return end
+            local total = metadata.shopData.price * payload.count
+            AddMoney(metadata.shopData.job, total, string.format("Venda de x%s %s por R$%s",
                 payload.count, payload.itemName, metadata.shopData.price))
         end
     end, {})
@@ -118,16 +120,16 @@ RegisterNetEvent("mri_qshops:refreshShop", function(shop)
     end
 end)
 
-RegisterNetEvent("mri_Qshops:setData", function(shop, slot, price)
+RegisterNetEvent("mri_Qshops:setData", function(shop, slot, price, job)
     local item = exports.ox_inventory:GetSlot(shop, slot)
     if not item then
         return
     end
-
     local metadata = item.metadata
     metadata.shopData = {
         shop = shop,
-        price = price
+        price = price,
+        job = job
     }
 
     exports.ox_inventory:SetMetadata(shop, slot, metadata)

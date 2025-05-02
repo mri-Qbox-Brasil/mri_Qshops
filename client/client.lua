@@ -1,13 +1,13 @@
 local points = {}
 local pointsTarget = {}
 
-RegisterNetEvent("mri_Qshops:setProductPrice", function(shop, slot)
+RegisterNetEvent("mri_Qshops:setProductPrice", function(shop, slot, job)
     local input = lib.inputDialog(locale("sell_price"), {locale("price_value")})
     local price = not input and 0 or tonumber(input[1])
     price = price < 0 and 0 or price
 
     TriggerEvent("ox_inventory:closeInventory")
-    TriggerServerEvent("mri_Qshops:setData", shop, slot, math.floor(price))
+    TriggerServerEvent("mri_Qshops:setData", shop, slot, math.floor(price), job)
     lib.notify({
         title = locale("success"),
         description = (locale("item_stocked_desc")):format(price),
