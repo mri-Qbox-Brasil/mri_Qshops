@@ -4,12 +4,12 @@ local ESX = exports['es_extended']:getSharedObject()
 
 RegisterNetEvent('esx:playerLoaded', function(xPlayer)
     PlayerData = xPlayer
-    PlayerLoaded = true
+    lib.callback.await("mri_Qshops:server:LoadShops", false)
+    TriggerServerEvent("mri_Qshops:server:createHooks")
 end)
 
 RegisterNetEvent('esx:onPlayerLogout', function()
     table.wipe(PlayerData)
-    PlayerLoaded = false
 end)
 
 RegisterNetEvent('esx:setJob', function(job)
@@ -30,6 +30,6 @@ AddEventHandler('onResourceStart', function(resource)
     if cache.resource == resource then
         Wait(500)
         PlayerData = ESX.GetPlayerData()
-        PlayerLoaded = true
+        lib.callback.await("mri_Qshops:server:LoadShops", false)
     end
 end)

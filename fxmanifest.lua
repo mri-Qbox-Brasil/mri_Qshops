@@ -1,18 +1,17 @@
------------------For support, scripts, and more----------------
---------------- https://discord.gg/wasabiscripts  -------------
----------------------------------------------------------------
 fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 use_experimental_fxv2_oal 'yes'
 
-description 'Wasabi OX Inventory Player Owned Shops'
-author 'wasabirobby#5110'
-version '1.0.4'
+description 'mri_Qshops'
+credits 'felps.j.j, mur4i, wasabirobby#5110'
+version '2.0.1'
+ox_lib 'locale'
 
 shared_scripts {
+    '@qbx_core/modules/playerdata.lua',
     '@ox_lib/init.lua',
-    'configuration/*.lua',
+    'config.lua',
     'bridge/framework.lua'
 }
 
@@ -22,10 +21,17 @@ client_scripts {
 }
 
 server_scripts {
+    "@oxmysql/lib/MySQL.lua",
     'bridge/**/server.lua',
     'server/*.lua'
 }
 
+files {
+    'locales/*.json',
+}
+
 dependencies {
+    "qbx_core",
+    "ox_lib",
     'ox_inventory'
 }
