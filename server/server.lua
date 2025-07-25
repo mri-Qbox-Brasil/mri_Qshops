@@ -13,6 +13,10 @@ local function RemoveHooks()
         return
     end
 
+    for i = 1, #buyHook do
+        exports.ox_inventory:removeHooks(buyHook[i])
+    end
+
     for i = 1, #swapHook do
         exports.ox_inventory:removeHooks(swapHook[i])
     end
